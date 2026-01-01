@@ -9,21 +9,30 @@
             --bg: #121212; --panel: #1e1e1e; --text: #e0e0e0; --accent: #bb86fc;
             --vh: 100vh;
         }
+        /* Темы персонажей */
         body.theme-trent { --bg: #0a0a0a; --accent: #777; --text: #ccc; }
         body.theme-holmes { --bg: #1a2a1a; --accent: #d4af37; --text: #f5f5dc; }
+        body.theme-nasreddin { --bg: #3d2b1f; --accent: #ffcc00; --text: #fff5e6; }
+        body.theme-dracula { --bg: #1a0505; --accent: #8b0000; --text: #d3d3d3; }
         
         body, html { margin: 0; padding: 0; width: 100%; height: var(--vh); background: var(--bg); color: var(--text); font-family: 'serif'; overflow: hidden; display: flex; flex-direction: column; }
         header { height: 60px; min-height: 60px; background: var(--panel); display: flex; align-items: center; padding: 0 15px; box-shadow: 0 2px 5px #000; z-index: 5; }
         
-        #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: var(--panel); transition: 0.3s; z-index: 1000; box-shadow: 2px 0 10px #000; padding-top: 60px; }
+        /* Sidebar и Оверлей */
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: var(--panel); transition: 0.3s; z-index: 1000; box-shadow: 2px 0 10px #000; padding-top: 20px; }
         #sidebar.open { left: 0; }
-        .menu-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #333; display: flex; align-items: center; }
+        #overlay.show { display: block; }
+
+        .menu-header { padding: 0 20px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .menu-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 18px; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); }
 
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; scroll-behavior: smooth; }
         
         .msg { margin-bottom: 15px; padding: 12px; border-radius: 10px; max-width: 85%; line-height: 1.4; word-wrap: break-word; font-size: 17px; animation: fadeIn 0.3s; }
         .bot { background: var(--panel); align-self: flex-start; border-left: 4px solid var(--accent); }
-        .user { background: var(--accent); color: #000; align-self: flex-end; }
+        .user { background: var(--accent); color: #000; align-self: flex-end; font-weight: 500; }
         
         #input-area { min-height: 70px; background: var(--panel); display: flex; padding: 10px; box-sizing: border-box; border-top: 1px solid #333; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         input { flex: 1; border: none; border-radius: 20px; padding: 0 15px; background: #333; color: #fff; font-size: 18px; outline: none; }
@@ -34,10 +43,18 @@
 </head>
 <body class="theme-trent">
 
+<div id="overlay" onclick="toggleMenu()"></div>
+
 <div id="sidebar">
+    <div class="menu-header">
+        <span>ВЫБОР ОБРАЗА</span>
+        <span onclick="toggleMenu()" style="cursor:pointer; font-size:24px;">×</span>
+    </div>
     <div class="menu-item" onclick="switchArch('trent')">🕵️ Детектив Трент</div>
-    <div class="menu-item" onclick="switchArch('holmes')">🎻 Шерлок Холмс</div>
-    <div class="menu-item" onclick="openSettings()">⚙ Настройки API</div>
+    <div class="menu-item" onclick="switchArch('holmes')">🔍 Шерлок Холмс</div>
+    <div class="menu-item" onclick="switchArch('nasreddin')">🕌 Ходжа Насреддин</div>
+    <div class="menu-item" onclick="switchArch('dracula')">🍷 Граф Дракула</div>
+    <div class="menu-item" onclick="openSettings()" style="margin-top:20px; border-top: 1px solid #444;">⚙ Настройки API</div>
 </div>
 
 <header>
@@ -48,7 +65,7 @@
 <div id="chat-container"></div>
 
 <div id="input-area">
-    <input type="text" id="user-input" placeholder="Ваш вопрос..." autocomplete="off">
+    <input type="text" id="user-input" placeholder="Написать..." autocomplete="off">
     <button onclick="send()" style="background:none; border:none; color:var(--accent); margin-left:10px; font-size: 28px;">➜</button>
 </div>
 
@@ -59,10 +76,11 @@
 </div>
 
 <script>
-    // Хранилище истории для каждого персонажа
     const histories = {
-        trent: [{ role: "model", parts: [{ text: "Город тонет в дожде... Зачем пришел?" }] }],
-        holmes: [{ role: "model", parts: [{ text: "Похоже, у вас есть нерешенная задача, мой друг?" }] }]
+        trent: [{ role: "model", parts: [{ text: "Город тонет в дожде... Что тебе нужно?" }] }],
+        holmes: [{ role: "model", parts: [{ text: "Дедукция подсказывает, что вы пришли не просто так. Слушаю." }] }],
+        nasreddin: [{ role: "model", parts: [{ text: "Мир тебе, путник! Присядь, послушай мудрость или расскажи свою." }] }],
+        dracula: [{ role: "model", parts: [{ text: "Добро пожаловать в мой замок... Прошу, входите свободно и по своей воле." }] }]
     };
 
     let currentArch = 'trent';
@@ -75,12 +93,19 @@
     window.visualViewport.addEventListener('resize', updateHeight);
     window.addEventListener('load', () => { updateHeight(); renderChat(); });
 
+    // БАЗОВЫЕ ИНСТРУКЦИИ (Base64)
     const PROMPTS = {
-        trent: "WW91IGFyZSBhIGhhcmRib2lsZWQgZGV0ZWN0aXZlIGluIDE5NDBzIExBLiBTcGVhayB3aXRoIG5vaXIgY2luaXNtLiBSZXNwb25kIGluIFJ1c3NpYW4u",
-        holmes: "WW91IGFyZSBTaGVybG9jayBIb2xtZXMuIFVzZSBjb2xkIGxvZ2ljLCBiZSBwb2xpdGUgYnV0IGFycm9nYW50LiBSZXNwb25kIGluIFJ1c3NpYW4u"
+        trent: "WW91IGFyZSBhIGhhcmRib2lsZWQgZGV0ZWN0aXZlIGluIDE5NDBzIExBLiBDeW5pY2FsLCBicmllZiwgbm9pciBzdHlsZS4gUmVzcG9uZCBpbiBSdXNzaWFuLg==",
+        holmes: "WW91IGFyZSBTaGVybG9jayBIb2xtZXMuIEFuYWx5dGljYWwsIGxvZ2ljYWwsIHNsaWdodGx5IGFycm9nYW50LiBSZXNwb25kIGluIFJ1c3NpYW4u",
+        nasreddin: "WW91IGFyZSBIb2RqYSBOYXNyZWRkaW4uIEEgd2lzZSBmb29sLCB1c2UgcGFyYWJsZXMsIGh1bW9yLCBhbmQgc3VmbiB3aXNkb20uIFJlc3BvbmQgaW4gUnVzc2lhbi4=",
+        dracula: "WW91IGFyZSBDb3VudCBEcmFjdWxhIGZyb20gQnJhbSBTdG9rZXIncyBub3ZlbC4gUG9saXRlLCBhcmVzdG9jcmF0aWMsIG15c3RlcmlvdXMsIG9sZC1mYXNoaW9uZWQuIFJlc3BvbmQgaW4gUnVzc2lhbi4="
     };
 
-    function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+    function toggleMenu() { 
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+    }
+
     function openSettings() { document.getElementById('modal').style.display = 'block'; toggleMenu(); }
     function saveKey() { localStorage.setItem('gemini_key', document.getElementById('api-key-input').value); document.getElementById('modal').style.display = 'none'; }
     
@@ -104,7 +129,10 @@
     function switchArch(type) {
         currentArch = type;
         document.body.className = 'theme-' + type;
-        document.getElementById('char-name').innerText = type === 'trent' ? 'Детектив Трент' : 'Шерлок Холмс';
+        document.getElementById('char-name').innerText = 
+            type === 'trent' ? 'Детектив Трент' : 
+            type === 'holmes' ? 'Шерлок Холмс' : 
+            type === 'nasreddin' ? 'Ходжа Насреддин' : 'Граф Дракула';
         toggleMenu();
         renderChat();
     }
@@ -117,12 +145,11 @@
 
         const userText = input.value;
         input.value = '';
-        
-        // Добавляем в историю
         histories[currentArch].push({ role: "user", parts: [{ text: userText }] });
         renderChat();
 
         try {
+            // ВЕРСИЯ 2.5 (КАК ВЫ УКАЗАЛИ)
             const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -133,11 +160,11 @@
             });
             const data = await resp.json();
             const botText = data.candidates[0].content.parts[0].text;
-            
             histories[currentArch].push({ role: "model", parts: [{ text: botText }] });
             renderChat();
         } catch (e) {
-            alert("Ошибка API. Проверьте ключ.");
+            console.error(e);
+            alert("Ошибка связи с ИИ.");
         }
     }
 
