@@ -1,26 +1,11 @@
 {
-  "name": "Minimal PWA Test",
-  "short_name": "PWA Test",
-  "description": "Тестовое приложение для проверки сборки APK",
-  "id": "/pwa/",
-  "start_url": "/pwa/",
-  "scope": "/pwa/",
+  "name": "Archetype AI",
+  "short_name": "Archetype",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "orientation": "portrait",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

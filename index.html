@@ -4,115 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Archetype AI</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root { 
             --bg: #121212; --panel: #1e1e1e; --text: #e0e0e0; --accent: #bb86fc;
             --vh: 100vh;
         }
-        /* Темы персонажей */
         body.theme-trent { --bg: #0a0a0a; --accent: #777; --text: #ccc; }
         body.theme-holmes { --bg: #1a2a1a; --accent: #d4af37; --text: #f5f5dc; }
         body.theme-nasreddin { --bg: #3d2b1f; --accent: #ffcc00; --text: #fff5e6; }
         body.theme-dracula { --bg: #1a0505; --accent: #8b0000; --text: #d3d3d3; }
+
+        body, html { margin: 0; padding: 0; width: 100%; height: var(--vh); background: var(--bg); color: var(--text); font-family: 'serif'; overflow: hidden; }
         
-        body, html { margin: 0; padding: 0; width: 100%; height: var(--vh); background: var(--bg); color: var(--text); font-family: 'serif'; overflow: hidden; display: flex; flex-direction: column; }
+        /* Стартовый экран */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 3000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .start-btn { background: var(--accent); color: #000; padding: 15px 40px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        /* Основной интерфейс (скрыт по умолчанию) */
+        #app-interface { display: none; flex-direction: column; height: 100%; }
+
         header { height: 60px; min-height: 60px; background: var(--panel); display: flex; align-items: center; padding: 0 15px; box-shadow: 0 2px 5px #000; z-index: 5; }
-        
-        /* Sidebar и Оверлей */
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
         #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: var(--panel); transition: 0.3s; z-index: 1000; box-shadow: 2px 0 10px #000; padding-top: 20px; }
         #sidebar.open { left: 0; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
         #overlay.show { display: block; }
 
-        .menu-header { padding: 0 20px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .menu-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 18px; }
-        .menu-item:hover { background: rgba(255,255,255,0.05); }
-
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; scroll-behavior: smooth; }
-        
-        .msg { margin-bottom: 15px; padding: 12px; border-radius: 10px; max-width: 85%; line-height: 1.4; word-wrap: break-word; font-size: 17px; animation: fadeIn 0.3s; }
+        .msg { margin-bottom: 15px; padding: 12px; border-radius: 10px; max-width: 85%; line-height: 1.4; word-wrap: break-word; font-size: 17px; }
         .bot { background: var(--panel); align-self: flex-start; border-left: 4px solid var(--accent); }
-        .user { background: var(--accent); color: #000; align-self: flex-end; font-weight: 500; }
+        .user { background: var(--accent); color: #000; align-self: flex-end; }
         
         #input-area { min-height: 70px; background: var(--panel); display: flex; padding: 10px; box-sizing: border-box; border-top: 1px solid #333; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         input { flex: 1; border: none; border-radius: 20px; padding: 0 15px; background: #333; color: #fff; font-size: 18px; outline: none; }
-        
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 20px; z-index: 2000; border: 1px solid var(--accent); width: 85%; box-shadow: 0 0 20px #000; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="theme-trent">
 
-<div id="overlay" onclick="toggleMenu()"></div>
-
-<div id="sidebar">
-    <div class="menu-header">
-        <span>ВЫБОР ОБРАЗА</span>
-        <span onclick="toggleMenu()" style="cursor:pointer; font-size:24px;">×</span>
+<div id="intro-screen">
+    <h1>Archetype AI</h1>
+    <p>Добро пожаловать в пространство живых историй.</p>
+    <div style="text-align: left; max-width: 400px; font-size: 0.9em; opacity: 0.8;">
+        • <b>Трент:</b> Нуарный детектив из 40-х.<br>
+        • <b>Холмс:</b> Холодная логика и дедукция.<br>
+        • <b>Насреддин:</b> Восточная мудрость и юмор.<br>
+        • <b>Дракула:</b> Вековая аристократичная тьма.
     </div>
-    <div class="menu-item" onclick="switchArch('trent')">🕵️ Детектив Трент</div>
-    <div class="menu-item" onclick="switchArch('holmes')">🔍 Шерлок Холмс</div>
-    <div class="menu-item" onclick="switchArch('nasreddin')">🕌 Ходжа Насреддин</div>
-    <div class="menu-item" onclick="switchArch('dracula')">🍷 Граф Дракула</div>
-    <div class="menu-item" onclick="openSettings()" style="margin-top:20px; border-top: 1px solid #444;">⚙ Настройки API</div>
+    <button class="start-btn" onclick="startApp()">НАЧАТЬ ТЕСТ</button>
 </div>
 
-<header>
-    <div onclick="toggleMenu()" style="cursor:pointer; font-size:24px; margin-right:15px;">☰</div>
-    <div id="char-name">Детектив Трент</div>
-</header>
+<div id="app-interface">
+    <div id="overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar">
+        <div style="padding: 20px; font-weight: bold; border-bottom: 1px solid #444;">ПЕРСОНАЖИ</div>
+        <div class="menu-item" onclick="switchArch('trent')" style="padding: 15px 20px; cursor: pointer;">🕵️ Трент</div>
+        <div class="menu-item" onclick="switchArch('holmes')" style="padding: 15px 20px; cursor: pointer;">🔍 Холмс</div>
+        <div class="menu-item" onclick="switchArch('nasreddin')" style="padding: 15px 20px; cursor: pointer;">🕌 Насреддин</div>
+        <div class="menu-item" onclick="switchArch('dracula')" style="padding: 15px 20px; cursor: pointer;">🍷 Дракула</div>
+    </div>
 
-<div id="chat-container"></div>
+    <header>
+        <div onclick="toggleMenu()" style="cursor:pointer; font-size:24px; margin-right:15px;">☰</div>
+        <div id="char-name">Детектив Трент</div>
+    </header>
 
-<div id="input-area">
-    <input type="text" id="user-input" placeholder="Написать..." autocomplete="off">
-    <button onclick="send()" style="background:none; border:none; color:var(--accent); margin-left:10px; font-size: 28px;">➜</button>
-</div>
+    <div id="chat-container"></div>
 
-<div id="modal">
-    <h3>Настройки API</h3>
-    <input type="text" id="api-key-input" placeholder="Ключ Gemini..." style="width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 10px; background:#222; color:#fff; border:1px solid #444;">
-    <button onclick="saveKey()" style="padding: 10px 20px; background: var(--accent); border: none; color: #000; width:100%;">Сохранить</button>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Написать..." autocomplete="off">
+        <button onclick="send()" style="background:none; border:none; color:var(--accent); margin-left:10px; font-size: 28px;">➜</button>
+    </div>
 </div>
 
 <script>
+    const RENDER_URL = "https://ВАШ-URL-НА-RENDER.onrender.com/chat";
     const histories = {
-        trent: [{ role: "model", parts: [{ text: "Город тонет в дожде... Что тебе нужно?" }] }],
-        holmes: [{ role: "model", parts: [{ text: "Дедукция подсказывает, что вы пришли не просто так. Слушаю." }] }],
-        nasreddin: [{ role: "model", parts: [{ text: "Мир тебе, путник! Присядь, послушай мудрость или расскажи свою." }] }],
-        dracula: [{ role: "model", parts: [{ text: "Добро пожаловать в мой замок... Прошу, входите свободно и по своей воле." }] }]
+        trent: [{ role: "model", text: "Город тонет в дожде... Зачем пришел?" }],
+        holmes: [{ role: "model", text: "Слушаю вас внимательно." }],
+        nasreddin: [{ role: "model", text: "Мир тебе, путник!" }],
+        dracula: [{ role: "model", text: "Входите свободно..." }]
     };
-
     let currentArch = 'trent';
 
-    function updateHeight() {
-        const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-        scrollToBottom();
-    }
+    function startApp() { document.getElementById('intro-screen').style.display = 'none'; document.getElementById('app-interface').style.display = 'flex'; updateHeight(); renderChat(); }
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+    function updateHeight() { document.documentElement.style.setProperty('--vh', `${window.visualViewport.height}px`); }
     window.visualViewport.addEventListener('resize', updateHeight);
-    window.addEventListener('load', () => { updateHeight(); renderChat(); });
-
-    // БАЗОВЫЕ ИНСТРУКЦИИ (Base64)
-    const PROMPTS = {
-        trent: "WW91IGFyZSBhIGhhcmRib2lsZWQgZGV0ZWN0aXZlIGluIDE5NDBzIExBLiBDeW5pY2FsLCBicmllZiwgbm9pciBzdHlsZS4gUmVzcG9uZCBpbiBSdXNzaWFuLg==",
-        holmes: "WW91IGFyZSBTaGVybG9jayBIb2xtZXMuIEFuYWx5dGljYWwsIGxvZ2ljYWwsIHNsaWdodGx5IGFycm9nYW50LiBSZXNwb25kIGluIFJ1c3NpYW4u",
-        nasreddin: "WW91IGFyZSBIb2RqYSBOYXNyZWRkaW4uIEEgd2lzZSBmb29sLCB1c2UgcGFyYWJsZXMsIGh1bW9yLCBhbmQgc3VmbiB3aXNkb20uIFJlc3BvbmQgaW4gUnVzc2lhbi4=",
-        dracula: "WW91IGFyZSBDb3VudCBEcmFjdWxhIGZyb20gQnJhbSBTdG9rZXIncyBub3ZlbC4gUG9saXRlLCBhcmVzdG9jcmF0aWMsIG15c3RlcmlvdXMsIG9sZC1mYXNoaW9uZWQuIFJlc3BvbmQgaW4gUnVzc2lhbi4="
-    };
-
-    function toggleMenu() { 
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
-    }
-
-    function openSettings() { document.getElementById('modal').style.display = 'block'; toggleMenu(); }
-    function saveKey() { localStorage.setItem('gemini_key', document.getElementById('api-key-input').value); document.getElementById('modal').style.display = 'none'; }
-    
-    function scrollToBottom() {
-        const chat = document.getElementById('chat-container');
-        chat.scrollTop = chat.scrollHeight;
-    }
 
     function renderChat() {
         const chat = document.getElementById('chat-container');
@@ -120,56 +102,35 @@
         histories[currentArch].forEach(msg => {
             const div = document.createElement('div');
             div.className = `msg ${msg.role === 'user' ? 'user' : 'bot'}`;
-            div.innerText = msg.parts[0].text;
+            div.innerText = msg.text;
             chat.appendChild(div);
         });
-        scrollToBottom();
+        chat.scrollTop = chat.scrollHeight;
     }
 
-    function switchArch(type) {
-        currentArch = type;
-        document.body.className = 'theme-' + type;
-        document.getElementById('char-name').innerText = 
-            type === 'trent' ? 'Детектив Трент' : 
-            type === 'holmes' ? 'Шерлок Холмс' : 
-            type === 'nasreddin' ? 'Ходжа Насреддин' : 'Граф Дракула';
-        toggleMenu();
-        renderChat();
-    }
+    function switchArch(type) { currentArch = type; document.body.className = 'theme-' + type; document.getElementById('char-name').innerText = type.toUpperCase(); toggleMenu(); renderChat(); }
 
     async function send() {
         const input = document.getElementById('user-input');
-        const key = localStorage.getItem('gemini_key');
-        if (!key) { openSettings(); return; }
         if (!input.value) return;
-
-        const userText = input.value;
+        const text = input.value;
         input.value = '';
-        histories[currentArch].push({ role: "user", parts: [{ text: userText }] });
+        histories[currentArch].push({ role: "user", text: text });
         renderChat();
 
         try {
-            // ВЕРСИЯ 2.5 (КАК ВЫ УКАЗАЛИ)
-            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+            const res = await fetch(RENDER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    contents: histories[currentArch],
-                    systemInstruction: { parts: [{ text: atob(PROMPTS[currentArch]) }] }
-                })
+                body: JSON.stringify({ message: text, char_id: currentArch })
             });
-            const data = await resp.json();
-            const botText = data.candidates[0].content.parts[0].text;
-            histories[currentArch].push({ role: "model", parts: [{ text: botText }] });
+            const data = await res.json();
+            histories[currentArch].push({ role: "model", text: data.reply });
             renderChat();
         } catch (e) {
-            console.error(e);
-            alert("Ошибка связи с ИИ.");
+            alert("Сервер просыпается... Попробуйте еще раз через 20 секунд.");
         }
     }
-
-    document.getElementById('user-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
 </script>
 </body>
 </html>
-
