@@ -1,49 +1,181 @@
-<script>
-async function sendMessage() {
-    const userInput = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
-    const message = userInput.value.trim();
 
-    if (!message) return;
-
-    // Добавляем сообщение пользователя в чат
-    appendMessage('user', message);
-    userInput.value = '';
-
-    try {
-        // Отправляем запрос на ваш Render-бэкенд
-        const response = await fetch('https://logic-q6qn.onrender.com/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                character: 'dracula', // По умолчанию Дракула
-                history: [] // Здесь можно передавать историю позже
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            appendMessage('bot', data.response);
-        } else {
-            console.error('Ошибка сервера:', response.status);
-            appendMessage('bot', 'Дракула задумался слишком надолго... Попробуйте еще раз через минуту.');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archetype AI — Мир Персонажей</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
-    } catch (error) {
-        console.error('Ошибка связи:', error);
-        appendMessage('bot', 'Не удалось связаться с замком. Проверьте интернет или подождите пробуждения сервера.');
-    }
-}
 
-function appendMessage(role, text) {
-    const chatBox = document.getElementById('chat-box');
-    const msgDiv = document.createElement('div');
-    msgDiv.className = role === 'user' ? 'user-msg' : 'bot-msg';
-    msgDiv.innerText = text;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+        /* Шапка и информация */
+        header {
+            background-color: #2d2d2d;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #3d3d3d;
+        }
+
+        h1 { margin: 0; color: #ff4d4d; }
+        .info-text { font-size: 0.9em; color: #aaaaaa; margin-top: 5px; }
+
+        /* Область чата */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            line-height: 1.4;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background-color: #4d4dff;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-msg {
+            align-self: flex-start;
+            background-color: #3d3d3d;
+            color: #e0e0e0;
+            border-bottom-left-radius: 2px;
+            border-left: 4px solid #ff4d4d;
+        }
+
+        /* Поле ввода */
+        .input-area {
+            background-color: #2d2d2d;
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 2px solid #3d3d3d;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #444;
+            background-color: #1a1a1a;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            background-color: #ff4d4d;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #ff3333; }
+
+        /* Индикатор ожидания */
+        #loading {
+            display: none;
+            font-size: 0.8em;
+            color: #888;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ARCHETYPE</h1>
+    <div class="info-text">
+        Общайтесь с персонажами на <b>любом языке мира</b>. <br>
+        Дракула и другие спутники поймут вас, на каком бы языке вы ни обратились.
+    </div>
+</header>
+
+<div id="chat-container">
+    <div class="message bot-msg">Приветствую. Я граф Дракула. Мы можем беседовать на вашем родном языке — я владею ими всеми. О чем вы желаете поведать?</div>
+</div>
+
+<div id="loading">Связь с замком... (сервер просыпается)</div>
+
+<div class="input-area">
+    <input type="text" id="user-input" placeholder="Напишите что-нибудь..." onkeypress="if(event.key === 'Enter') sendMessage()">
+    <button onclick="sendMessage()">Отправить</button>
+</div>
+
+<script>
+    const RENDER_URL = "https://logic-q6qn.onrender.com/chat";
+    let chatHistory = [];
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        const loadingHint = document.getElementById('loading');
+        
+        if (!text) return;
+
+        // Отображаем сообщение пользователя
+        appendMessage('user', text);
+        input.value = '';
+        loadingHint.style.display = 'block';
+
+        try {
+            const response = await fetch(RENDER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    character: 'dracula',
+                    history: chatHistory
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                appendMessage('bot', data.response);
+                // Сохраняем в историю
+                chatHistory.push({role: 'user', text: text});
+                chatHistory.push({role: 'bot', text: data.response});
+            } else {
+                appendMessage('bot', "Произошла ошибка связи. Попробуйте еще раз.");
+            }
+        } catch (error) {
+            console.error("Ошибка:", error);
+            appendMessage('bot', "Сервер не ответил вовремя. Возможно, он еще просыпается. Повторите попытку через 20-30 секунд.");
+        } finally {
+            loadingHint.style.display = 'none';
+        }
+    }
+
+    function appendMessage(role, text) {
+        const container = document.getElementById('chat-container');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
+        msgDiv.innerText = text;
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+    }
 </script>
 
+</body>
+</html>
