@@ -4,176 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archetype AI — Мир Персонажей</title>
+    <title>Archetype AI</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* Шапка и информация */
-        header {
-            background-color: #2d2d2d;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid #3d3d3d;
-        }
-
-        h1 { margin: 0; color: #ff4d4d; }
-        .info-text { font-size: 0.9em; color: #aaaaaa; margin-top: 5px; }
-
-        /* Область чата */
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            line-height: 1.4;
-        }
-
-        .user-msg {
-            align-self: flex-end;
-            background-color: #4d4dff;
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .bot-msg {
-            align-self: flex-start;
-            background-color: #3d3d3d;
-            color: #e0e0e0;
-            border-bottom-left-radius: 2px;
-            border-left: 4px solid #ff4d4d;
-        }
-
-        /* Поле ввода */
-        .input-area {
-            background-color: #2d2d2d;
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-            border-top: 2px solid #3d3d3d;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 25px;
-            border: 1px solid #444;
-            background-color: #1a1a1a;
-            color: white;
-            outline: none;
-        }
-
-        button {
-            padding: 10px 20px;
-            border-radius: 25px;
-            border: none;
-            background-color: #ff4d4d;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        button:hover { background-color: #ff3333; }
-
-        /* Индикатор ожидания */
-        #loading {
-            display: none;
-            font-size: 0.8em;
-            color: #888;
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
+        body { font-family: sans-serif; background: #1a1a1a; color: #eee; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #2d2d2d; padding: 15px; text-align: center; border-bottom: 2px solid #ff4d4d; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; line-height: 1.4; }
+        .user { align-self: flex-end; background: #4d4dff; }
+        .bot { align-self: flex-start; background: #333; border-left: 3px solid #ff4d4d; }
+        .input-area { background: #2d2d2d; padding: 15px; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border-radius: 20px; border: none; background: #000; color: #fff; outline: none; }
+        button { background: #ff4d4d; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
+        .error-text { color: #ff9999; font-size: 0.8em; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>ARCHETYPE</h1>
-    <div class="info-text">
-        Общайтесь с персонажами на <b>любом языке мира</b>. <br>
-        Дракула и другие спутники поймут вас, на каком бы языке вы ни обратились.
-    </div>
+    <strong>ARCHETYPE</strong><br>
+    <small>Система понимает любой язык</small>
 </header>
 
-<div id="chat-container">
-    <div class="message bot-msg">Приветствую. Я граф Дракула. Мы можем беседовать на вашем родном языке — я владею ими всеми. О чем вы желаете поведать?</div>
+<div id="chat-box">
+    <div class="msg bot">Приветствую. Я граф Дракула. О чем пожелаете поговорить? (Пишите на любом языке)</div>
 </div>
 
-<div id="loading">Связь с замком... (сервер просыпается)</div>
-
 <div class="input-area">
-    <input type="text" id="user-input" placeholder="Напишите что-нибудь..." onkeypress="if(event.key === 'Enter') sendMessage()">
+    <input type="text" id="user-input" placeholder="Введите сообщение...">
     <button onclick="sendMessage()">Отправить</button>
 </div>
 
 <script>
     const RENDER_URL = "https://logic-q6qn.onrender.com/chat";
-    let chatHistory = [];
 
     async function sendMessage() {
         const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
         const text = input.value.trim();
-        const loadingHint = document.getElementById('loading');
-        
+
         if (!text) return;
 
-        // Отображаем сообщение пользователя
+        // Показываем сообщение пользователя
         appendMessage('user', text);
         input.value = '';
-        loadingHint.style.display = 'block';
 
         try {
             const response = await fetch(RENDER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: text,
-                    character: 'dracula',
-                    history: chatHistory
-                })
+                body: JSON.stringify({ message: text })
             });
 
-            const data = await response.json();
-
             if (response.ok) {
+                const data = await response.json();
                 appendMessage('bot', data.response);
-                // Сохраняем в историю
-                chatHistory.push({role: 'user', text: text});
-                chatHistory.push({role: 'bot', text: data.response});
             } else {
-                appendMessage('bot', "Произошла ошибка связи. Попробуйте еще раз.");
+                const errData = await response.text();
+                appendMessage('bot', "Ошибка сервера: " + response.status + ". Попробуйте еще раз через 30 секунд.");
+                console.log(errData);
             }
-        } catch (error) {
-            console.error("Ошибка:", error);
-            appendMessage('bot', "Сервер не ответил вовремя. Возможно, он еще просыпается. Повторите попытку через 20-30 секунд.");
-        } finally {
-            loadingHint.style.display = 'none';
+        } catch (e) {
+            // Если сервер "спит", fetch может упасть по таймауту или CORS
+            appendMessage('bot', "Связь прервана. Сервер просыпается или URL недоступен. Подождите немного.");
+            appendMessage('bot', "Детали: " + e.message, true);
         }
     }
 
-    function appendMessage(role, text) {
-        const container = document.getElementById('chat-container');
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
-        msgDiv.innerText = text;
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
+    function appendMessage(role, text, isError = false) {
+        const chatBox = document.getElementById('chat-box');
+        const div = document.createElement('div');
+        div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+        if (isError) div.className += ' error-text';
+        div.innerText = text;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 </script>
 
