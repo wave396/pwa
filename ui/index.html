@@ -3,46 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Final CDN Test</title>
-  
+  <title>Debug UI</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css">
-  
-  <style>
-    /* Этот текст будет виден, только если всё сломалось */
-    #emergency-msg {
-      padding: 20px;
-      color: black;
-      font-family: sans-serif;
-      text-align: center;
-    }
-    /* Если JS сработал, Framework7 добавит класс 'framework7-initializing' на <html> */
-    .framework7-initializing #emergency-msg {
-      display: none;
-    }
-  </style>
 </head>
-<body>
+<body style="background: #ccc;">
 
-  <div id="emergency-msg">
-    <h2>Ожидание загрузки интерфейса...</h2>
-    <p>Если вы видите это сообщение дольше 5 секунд, значит JavaScript Framework7 не смог запуститься.</p>
+  <div id="debug-log" style="position:fixed; top:0; left:0; width:100%; background: black; color: lime; font-family: monospace; font-size: 12px; z-index: 9999; padding: 10px; max-height: 200px; overflow: scroll;">
+    Лог запуска:<br>
   </div>
 
   <div id="app">
     <div class="view view-main">
       <div class="page">
-        <div class="navbar">
-          <div class="navbar-bg"></div>
-          <div class="navbar-inner">
-            <div class="title">Работает!</div>
-          </div>
-        </div>
+        <div class="navbar"><div class="navbar-inner"><div class="title">Контрольный запуск</div></div></div>
         <div class="page-content">
-          <div class="block block-strong inset">
-            <p>Вы видите интерфейс Framework7 через CDN на GitHub Pages.</p>
-          </div>
           <div class="block">
-            <button class="button button-fill color-blue" onclick="app.dialog.alert('JS на связи!')">Проверка</button>
+             <button class="button button-fill" onclick="alert('Клик работает!')">Простая кнопка</button>
           </div>
         </div>
       </div>
@@ -50,22 +26,28 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.js"></script>
-  
+
   <script>
+    const logger = document.getElementById('debug-log');
+    function log(msg) { logger.innerHTML += "> " + msg + "<br>"; }
+
+    window.onerror = function(m, u, l) { log("ОШИБКА: " + m + " в строке " + l); };
+
+    log("Скрипт загружен");
+
     try {
+      log("Начало инициализации F7...");
       var app = new Framework7({
         root: '#app',
         theme: 'md',
         on: {
-          init: function () {
-            // Убираем аварийное сообщение вручную для надежности
-            document.getElementById('emergency-msg').style.display = 'none';
-          }
+          init: function() { log("Framework7 УСПЕШНО ЗАПУЩЕН!"); }
         }
       });
     } catch (e) {
-      alert("Ошибка JS: " + e.message);
+      log("CATCH: " + e.message);
     }
   </script>
 </body>
 </html>
+
