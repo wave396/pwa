@@ -1,26 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html class="md">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Debug UI</title>
+  <title>App</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css">
+  <style>
+    /* Принудительно задаем размеры, чтобы ничего не схлопывалось */
+    html, body, #app {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      background: #f7f7f8;
+    }
+  </style>
 </head>
-<body style="background: #ccc;">
-
-  <div id="debug-log" style="position:fixed; top:0; left:0; width:100%; background: black; color: lime; font-family: monospace; font-size: 12px; z-index: 9999; padding: 10px; max-height: 200px; overflow: scroll;">
-    Лог запуска:<br>
-  </div>
-
+<body>
   <div id="app">
-    <div class="view view-main">
+    <div class="view view-main view-init">
       <div class="page">
-        <div class="navbar"><div class="navbar-inner"><div class="title">Контрольный запуск</div></div></div>
-        <div class="page-content">
-          <div class="block">
-             <button class="button button-fill" onclick="alert('Клик работает!')">Простая кнопка</button>
+        
+        <div class="navbar">
+          <div class="navbar-bg"></div>
+          <div class="navbar-inner">
+            <div class="title">My Python App</div>
           </div>
         </div>
+
+        <div class="page-content">
+          <div class="block-title">Управление сервером</div>
+          <div class="block block-strong inset">
+            <p>Нажмите кнопку ниже, чтобы отправить сигнал на ваш Python скрипт (Render).</p>
+          </div>
+
+          <div class="block">
+            <button class="button button-fill button-large" onclick="sendToPython()">
+              Отправить запрос на Render
+            </button>
+          </div>
+
+          <div id="server-response" class="block block-strong inset" style="display:none; color: green; font-weight: bold;">
+            </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -28,24 +50,28 @@
   <script src="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.js"></script>
 
   <script>
-    const logger = document.getElementById('debug-log');
-    function log(msg) { logger.innerHTML += "> " + msg + "<br>"; }
+    var app = new Framework7({
+      root: '#app',
+      theme: 'md'
+    });
 
-    window.onerror = function(m, u, l) { log("ОШИБКА: " + m + " в строке " + l); };
+    async function sendToPython() {
+      // ЗАМЕНИТЕ на ваш URL с Render (обязательно https://)
+      const URL = 'https://ВАШ-ПРОЕКТ.onrender.com/api/test'; 
+      
+      app.dialog.preloader('Связь с сервером...');
 
-    log("Скрипт загружен");
-
-    try {
-      log("Начало инициализации F7...");
-      var app = new Framework7({
-        root: '#app',
-        theme: 'md',
-        on: {
-          init: function() { log("Framework7 УСПЕШНО ЗАПУЩЕН!"); }
-        }
-      });
-    } catch (e) {
-      log("CATCH: " + e.message);
+      try {
+        const response = await fetch(URL);
+        const data = await response.json();
+        
+        app.dialog.close();
+        document.getElementById('server-response').style.display = 'block';
+        document.getElementById('server-response').innerText = 'Ответ сервера: ' + JSON.stringify(data);
+      } catch (err) {
+        app.dialog.close();
+        app.dialog.alert('Ошибка связи: ' + err.message);
+      }
     }
   </script>
 </body>
