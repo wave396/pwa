@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CDN UI Test</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5/css/framework7-icons.css">
+  
+  <style>
+    body { 
+      user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    .page-content {
+      background-color: #f7f7f8;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="view view-main">
+      <div class="page">
+        
+        <div class="navbar">
+          <div class="navbar-bg"></div>
+          <div class="navbar-inner">
+            <div class="title">Тест через CDN</div>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <div class="block-title">Проверка связи</div>
+          <div class="block block-strong inset">
+            <p>Этот интерфейс загружен по HTTPS через GitHub Pages, используя внешние библиотеки.</p>
+          </div>
+
+          <div class="list inset">
+            <ul>
+              <li>
+                <div class="item-content">
+                  <div class="item-media"><i class="icon f7-icons">globe</i></div>
+                  <div class="item-inner">
+                    <div class="item-title">Источник</div>
+                    <div class="item-after">CDN (Internet)</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="block">
+            <button class="button button-fill button-large color-green" onclick="app.dialog.alert('Библиотеки загружены успешно!', 'Работает')">
+              Проверить работу JS
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.js"></script>
+  
+  <script>
+    var app = new Framework7({
+      root: '#app',
+      theme: 'md',
+    });
+  </script>
+</body>
+</html>
