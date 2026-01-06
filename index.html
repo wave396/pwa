@@ -6,32 +6,27 @@
   <title>Интеллектуальные расследования</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css">
   <style>
-    :root { --f7-theme-color: #37474f; }
-    html, body, #app { height: 100%; width: 100%; margin: 0; background: #1a1a1a; color: #eee; }
-    
-    /* Принудительная видимость страниц */
-    .page { background: #1a1a1a; }
-    
+    :root { --f7-theme-color: #546e7a; }
+    html, body, #app { height: 100%; width: 100%; margin: 0; background: #000; color: #eee; }
+    .page { background: #121212; }
     .welcome-screen {
-      background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1453722758971-da80396495ac?q=80&w=1000&auto=format&fit=crop');
+      background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1453722758971-da80396495ac?q=80&w=1000&auto=format&fit=crop');
       background-size: cover; background-position: center;
-      padding: 40px 20px; text-align: center; height: 100%; overflow-y: auto; box-sizing: border-box;
+      padding: 40px 24px; text-align: center; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;
     }
-    
-    .welcome-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #fff; text-transform: uppercase; letter-spacing: 2px; line-height: 1.2; }
-    .welcome-text { font-family: 'Georgia', serif; line-height: 1.6; font-style: italic; margin-bottom: 25px; color: #ccc; font-size: 15px; }
-    
-    .character-card { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 15px; margin-bottom: 12px; text-align: left; border-left: 4px solid #546e7a; }
-    .char-name { font-weight: bold; color: #fff; margin-bottom: 3px; font-size: 16px; }
-    .char-desc { font-size: 13px; opacity: 0.8; line-height: 1.4; }
-    
-    .message-text { font-family: 'Courier New', Courier, monospace; font-size: 15px; }
-    .messages-content { background: #121212 !important; }
-
-    /* Скрытие/показ страниц */
+    .welcome-title { font-size: 26px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; color: #fff; }
+    .welcome-text { font-family: 'Georgia', serif; line-height: 1.5; font-style: italic; color: #bbb; margin-bottom: 20px; }
+    .char-preview { background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left; border-left: 3px solid #fff; }
+    .char-preview b { display: block; color: #fff; margin-bottom: 4px; }
+    .char-preview span { font-size: 13px; opacity: 0.7; }
+    .messages-content { background: #0a0a0a !important; }
+    .message-text { font-family: 'Courier New', Courier, monospace; font-size: 15px; line-height: 1.4; }
+    .msg-jake .message-text { color: #d1d1d1; }
+    .msg-henri .message-text { color: #e0f2f1; border-left: 2px solid #4db6ac; padding-left: 8px; }
     #main-game-page { display: none; }
     .game-active #welcome-page { display: none; }
     .game-active #main-game-page { display: block; }
+    .item-title { color: #fff !important; font-size: 16px !important; }
   </style>
 </head>
 <body>
@@ -41,32 +36,11 @@
       
       <div class="page" id="welcome-page">
         <div class="page-content welcome-screen">
-          <div class="welcome-title">Интеллектуальные расследования</div>
-          
-          <div class="welcome-text">
-            Это не игра на скорость. Здесь нет насилия и случайных побед. <br>
-            Каждое дело — это диалог, наблюдение и вывод.
-          </div>
-
-          <div style="text-align:left; margin-bottom:10px; font-size:11px; opacity:0.5; letter-spacing:1px;">ПЕРСОНАЖИ</div>
-          
-          <div class="character-card">
-            <div class="char-name">Джейк Трент</div>
-            <div class="char-desc">Городской нуар. Дождь, тени, дым. Говорит прямо. Думает мрачно.</div>
-          </div>
-
-          <div class="character-card">
-            <div class="char-name">Анри Делакруа</div>
-            <div class="char-desc">Французский следователь. Ироничен и философичен. Замечает детали.</div>
-          </div>
-
-          <div class="welcome-text" style="font-size: 14px; margin-top:15px;">
-            Ты читаешь. Ты задаёшь вопросы. <br>
-            Здесь нет правильных ответов — есть логичные.
-          </div>
-
-          <button class="button button-fill button-large color-white text-color-black" onclick="startApp()" style="font-weight:bold; margin-top:10px;">Начать расследование</button>
-          <div style="height:60px;"></div>
+          <div class="welcome-title">Расследования</div>
+          <div class="welcome-text">Диалог, наблюдение и вывод. Здесь нет правильных ответов — есть логичные.</div>
+          <div class="char-preview"><b>Джейк Трент</b><span>Нуар. Дождь, тени и факты.</span></div>
+          <div class="char-preview"><b>Анри Делакруа</b><span>Ирония и детали.</span></div>
+          <button class="button button-fill button-large color-white text-color-black" onclick="startApp()" style="margin-top:20px; font-weight:bold;">Начать игру</button>
         </div>
       </div>
 
@@ -76,51 +50,56 @@
           <div class="navbar-inner">
             <div class="left"><a href="#" class="link icon-only panel-open" data-panel="left">☰</a></div>
             <div class="title" id="det-name">Джейк Трент</div>
-            <div class="right"><span id="diff-label" class="badge color-gray">LVL 1</span></div>
+            <div class="right"><span id="diff-label" class="badge color-blue">LVL 1</span></div>
           </div>
         </div>
 
         <div class="toolbar messagebar toolbar-bottom">
           <div class="toolbar-inner">
             <div class="messagebar-area">
-              <textarea id="msg-input" placeholder="Введите название дела..."></textarea>
+              <textarea id="msg-input" placeholder="Дело о..."></textarea>
             </div>
             <a href="#" class="link" onclick="handleSend()">Отправить</a>
           </div>
         </div>
 
         <div class="page-content messages-content">
-          <div class="messages" id="chat-box">
-            <div class="message message-received">
-              <div class="message-content">
-                <div class="message-text">Я слушаю, приятель. Какое дело у нас на повестке? Назови его.</div>
-              </div>
-            </div>
-          </div>
+          <div class="messages" id="chat-box"></div>
         </div>
       </div>
-
     </div>
 
     <div class="panel panel-left panel-cover theme-dark">
       <div class="page">
         <div class="page-content">
-          <div class="block-title">Детектив</div>
-          <div class="list no-hairlines">
+          <div class="block-title">Выберите детектива</div>
+          <div class="list">
             <ul>
-              <li><label class="item-radio item-content"><input type="radio" name="char" value="Jake" checked onclick="updateChar('Jake', 'Джейк Трент')"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Джейк Трент</div></div></label></li>
-              <li><label class="item-radio item-content"><input type="radio" name="char" value="Henri" onclick="updateChar('Henri', 'Анри Делакруа')"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Анри Делакруа</div></div></label></li>
+              <li>
+                <label class="item-radio item-content">
+                  <input type="radio" name="char" value="Jake" checked onclick="switchCharacter('Jake', 'Джейк Трент')"/>
+                  <i class="icon icon-radio"></i>
+                  <div class="item-inner"><div class="item-title">Джейк Трент</div></div>
+                </label>
+              </li>
+              <li>
+                <label class="item-radio item-content">
+                  <input type="radio" name="char" value="Henri" onclick="switchCharacter('Henri', 'Анри Делакруа')"/>
+                  <i class="icon icon-radio"></i>
+                  <div class="item-inner"><div class="item-title">Анри Делакруа</div></div>
+                </label>
+              </li>
             </ul>
           </div>
           <div class="block-title">Сложность</div>
-          <div class="list no-hairlines">
+          <div class="list">
             <ul>
-              <li><label class="item-radio item-content"><input type="radio" name="lv" value="1" checked onclick="updateLv(1)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Классика</div></div></label></li>
-              <li><label class="item-radio item-content"><input type="radio" name="lv" value="2" onclick="updateLv(2)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Анализ</div></div></label></li>
-              <li><label class="item-radio item-content"><input type="radio" name="lv" value="3" onclick="updateLv(3)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Лабиринт</div></div></label></li>
+              <li><label class="item-radio item-content"><input type="radio" name="lv" value="1" checked onclick="updateLv(1)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Уровень 1</div></div></label></li>
+              <li><label class="item-radio item-content"><input type="radio" name="lv" value="2" onclick="updateLv(2)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Уровень 2</div></div></label></li>
+              <li><label class="item-radio item-content"><input type="radio" name="lv" value="3" onclick="updateLv(3)"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Уровень 3</div></div></label></li>
             </ul>
           </div>
-          <div class="block"><button class="button button-fill panel-close">Закрыть настройки</button></div>
+          <div class="block"><button class="button button-fill panel-close">Принять</button></div>
         </div>
       </div>
     </div>
@@ -130,27 +109,46 @@
   <script>
     var app = new Framework7({ root: '#app', theme: 'md' });
     var state = { char: 'Jake', lv: 1 };
+    
+    // ХРАНИЛИЩЕ ИСТОРИИ ДЛЯ КАЖДОГО ДЕТЕКТИВА
+    var chatHistories = {
+      Jake: [{ text: "Я слушаю, приятель. Какое дело у нас на повестке?", type: 'received' }],
+      Henri: [{ text: "Я весь во внимании, друг. Какую тайну мы затронем?", type: 'received' }]
+    };
 
     function startApp() {
       document.getElementById('app').classList.add('game-active');
+      renderCurrentHistory();
     }
 
-    function updateChar(id, name) { 
-        state.char = id; 
-        document.getElementById('det-name').innerText = name;
-        addMessage(`Смена персонажа: ${name}`, 'received');
-    }
-    
-    function updateLv(n) { 
-        state.lv = n; 
-        document.getElementById('diff-label').innerText = 'LVL ' + n; 
+    function switchCharacter(id, name) {
+      state.char = id;
+      document.getElementById('det-name').innerText = name;
+      renderCurrentHistory();
     }
 
-    function addMessage(text, type) {
+    function updateLv(n) {
+      state.lv = n;
+      document.getElementById('diff-label').innerText = 'LVL ' + n;
+      // При смене уровня обычно логично продолжать тот же чат, 
+      // но с новыми инструкциями для следующих ответов.
+    }
+
+    function renderCurrentHistory() {
+      const chatContainer = document.getElementById('chat-box');
+      chatContainer.innerHTML = "";
+      const history = chatHistories[state.char];
+      history.forEach(msg => {
+        drawMessage(msg.text, msg.type);
+      });
+    }
+
+    function drawMessage(text, type) {
       const chat = document.getElementById('chat-box');
-      const msgHtml = `<div class="message message-${type}"><div class="message-content"><div class="message-text">${text}</div></div></div>`;
+      const charClass = (state.char === 'Jake') ? 'msg-jake' : 'msg-henri';
+      const msgHtml = `<div class="message message-${type} ${type==='received'?charClass:''}"><div class="message-content"><div class="message-text">${text}</div></div></div>`;
       chat.insertAdjacentHTML('beforeend', msgHtml);
-      document.querySelector('.page-content').scrollTo(0, chat.scrollHeight);
+      setTimeout(() => { document.querySelector('.messages-content').scrollTo(0, chat.scrollHeight); }, 50);
     }
 
     async function handleSend() {
@@ -158,8 +156,11 @@
       const text = inp.value.trim();
       if(!text) return;
       
-      addMessage(text, 'sent');
+      // Сохраняем в историю и рисуем
+      chatHistories[state.char].push({ text: text, type: 'sent' });
+      drawMessage(text, 'sent');
       inp.value = '';
+
       const characterId = state.char + state.lv;
 
       try {
@@ -168,13 +169,15 @@
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ char_id: characterId, message: text })
         });
-        
-        if (!response.ok) throw new Error('Код: ' + response.status);
-
         const data = await response.json();
-        addMessage(data.reply || data.response, 'received');
+        const reply = data.reply || data.response;
+        
+        // Сохраняем ответ в историю и рисуем
+        chatHistories[state.char].push({ text: reply, type: 'received' });
+        drawMessage(reply, 'received');
+        
       } catch(e) {
-        addMessage("ОШИБКА: " + e.message, 'received');
+        drawMessage("Ошибка связи. Проверьте сервер.", 'received');
       }
     }
   </script>
