@@ -145,7 +145,6 @@
       const charClass = (state.char === 'Jake') ? 'msg-jake' : 'msg-henri';
       const msgHtml = `<div class="message message-${type} ${type==='received'?charClass:''}"><div class="message-content"><div class="message-text">${text}</div></div></div>`;
       chat.insertAdjacentHTML('beforeend', msgHtml);
-      // Плавный скролл вниз
       setTimeout(() => { 
         const container = document.querySelector('.messages-content');
         if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
@@ -168,8 +167,8 @@
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ 
-            message: text,        // Соответствует data.get('message') в Python
-            char_id: characterId  // Соответствует data.get('char_id') в Python
+            char_id: characterId,
+            history: chatHistories[state.char] 
           })
         });
         
