@@ -20,7 +20,7 @@
     .char-preview b { display: block; color: #fff; margin-bottom: 4px; }
     .char-preview span { font-size: 13px; opacity: 0.7; }
     .messages-content { background: #0a0a0a !important; }
-    .message-text { font-family: 'Courier New', Courier, monospace; font-size: 15px; line-height: 1.4; }
+    .message-text { font-family: 'Courier New', Courier, monospace; font-size: 15px; line-height: 1.4; white-space: pre-wrap; }
     .msg-jake .message-text { color: #d1d1d1; }
     .msg-henri .message-text { color: #e0f2f1; border-left: 2px solid #4db6ac; padding-left: 8px; }
     #main-game-page { display: none; }
@@ -57,7 +57,7 @@
         <div class="toolbar messagebar toolbar-bottom">
           <div class="toolbar-inner">
             <div class="messagebar-area">
-              <textarea id="msg-input" placeholder="Дело о..."></textarea>
+              <textarea id="msg-input" placeholder="Введите сообщение..."></textarea>
             </div>
             <a href="#" class="link" onclick="handleSend()">Отправить</a>
           </div>
@@ -110,10 +110,9 @@
     var app = new Framework7({ root: '#app', theme: 'md' });
     var state = { char: 'Jake', lv: 1 };
     
-    // ХРАНИЛИЩЕ ИСТОРИИ ДЛЯ КАЖДОГО ДЕТЕКТИВА
     var chatHistories = {
       Jake: [{ text: "Я слушаю, приятель. Какое дело у нас на повестке?", type: 'received' }],
-      Henri: [{ text: "Я весь во внимании, друг. Какую тайну мы затронем?", type: 'received' }]
+      Henri: [{ text: "Я весь во внимании, мой друг. Какую тайну мы затронем сегодня?", type: 'received' }]
     };
 
     function startApp() {
@@ -130,8 +129,6 @@
     function updateLv(n) {
       state.lv = n;
       document.getElementById('diff-label').innerText = 'LVL ' + n;
-      // При смене уровня обычно логично продолжать тот же чат, 
-      // но с новыми инструкциями для следующих ответов.
     }
 
     function renderCurrentHistory() {
@@ -148,7 +145,11 @@
       const charClass = (state.char === 'Jake') ? 'msg-jake' : 'msg-henri';
       const msgHtml = `<div class="message message-${type} ${type==='received'?charClass:''}"><div class="message-content"><div class="message-text">${text}</div></div></div>`;
       chat.insertAdjacentHTML('beforeend', msgHtml);
-      setTimeout(() => { document.querySelector('.messages-content').scrollTo(0, chat.scrollHeight); }, 50);
+      // Плавный скролл вниз
+      setTimeout(() => { 
+        const container = document.querySelector('.messages-content');
+        if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }, 100);
     }
 
     async function handleSend() {
@@ -156,7 +157,6 @@
       const text = inp.value.trim();
       if(!text) return;
       
-      // Сохраняем в историю и рисуем
       chatHistories[state.char].push({ text: text, type: 'sent' });
       drawMessage(text, 'sent');
       inp.value = '';
@@ -167,17 +167,20 @@
         const response = await fetch('https://logic-q6qn.onrender.com/api/chat', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ char_id: characterId, message: text })
+          body: JSON.stringify({ 
+            message: text,        // Соответствует data.get('message') в Python
+            char_id: characterId  // Соответствует data.get('char_id') в Python
+          })
         });
-        const data = await response.json();
-        const reply = data.reply || data.response;
         
-        // Сохраняем ответ в историю и рисуем
+        const data = await response.json();
+        const reply = data.reply || "Детектив молчит...";
+        
         chatHistories[state.char].push({ text: reply, type: 'received' });
         drawMessage(reply, 'received');
         
       } catch(e) {
-        drawMessage("Ошибка связи. Проверьте сервер.", 'received');
+        drawMessage("Ошибка связи с сервером. Попробуйте позже.", 'received');
       }
     }
   </script>
