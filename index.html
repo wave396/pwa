@@ -33,7 +33,6 @@
 
   <div id="app">
     <div class="view view-main">
-      
       <div class="page" id="welcome-page">
         <div class="page-content welcome-screen">
           <div class="welcome-title">Расследования</div>
@@ -57,7 +56,7 @@
         <div class="toolbar messagebar toolbar-bottom">
           <div class="toolbar-inner">
             <div class="messagebar-area">
-              <textarea id="msg-input" placeholder="Введите сообщение..."></textarea>
+              <textarea id="msg-input" placeholder="Введите название дела..."></textarea>
             </div>
             <a href="#" class="link" onclick="handleSend()">Отправить</a>
           </div>
@@ -110,9 +109,10 @@
     var app = new Framework7({ root: '#app', theme: 'md' });
     var state = { char: 'Jake', lv: 1 };
     
+    // Приветственные сообщения теперь помечены как 'welcome'
     var chatHistories = {
-      Jake: [{ text: "Я слушаю, приятель. Какое дело у нас на повестке?", type: 'received' }],
-      Henri: [{ text: "Я весь во внимании, мой друг. Какую тайну мы затронем сегодня?", type: 'received' }]
+      Jake: [{ text: "Я слушаю, приятель. Какое дело у нас на повестке?", type: 'welcome' }],
+      Henri: [{ text: "Я весь во внимании, мой друг. Какую тайну мы затронем сегодня?", type: 'welcome' }]
     };
 
     function startApp() {
@@ -136,7 +136,8 @@
       chatContainer.innerHTML = "";
       const history = chatHistories[state.char];
       history.forEach(msg => {
-        drawMessage(msg.text, msg.type);
+        // Отрисовываем 'welcome' как 'received' (от детектива)
+        drawMessage(msg.text, msg.type === 'welcome' ? 'received' : msg.type);
       });
     }
 
@@ -162,13 +163,16 @@
 
       const characterId = state.char + state.lv;
 
+      // ОЧИСТКА ИСТОРИИ: Убираем приветственное сообщение перед отправкой в Gemini
+      const cleanHistory = chatHistories[state.char].filter(m => m.type !== 'welcome');
+
       try {
         const response = await fetch('https://logic-q6qn.onrender.com/api/chat', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ 
             char_id: characterId,
-            history: chatHistories[state.char] 
+            history: cleanHistory 
           })
         });
         
@@ -179,7 +183,7 @@
         drawMessage(reply, 'received');
         
       } catch(e) {
-        drawMessage("Ошибка связи с сервером. Попробуйте позже.", 'received');
+        drawMessage("Ошибка связи. Попробуйте снова.", 'received');
       }
     }
   </script>
