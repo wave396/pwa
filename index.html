@@ -11,51 +11,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.colors.min.css">
     
     <style>
-        /* Кастомные правки для атмосферы */
-        .message { margin-bottom: 15px; }
-        .message-text { padding: 10px 15px; border-radius: 8px; font-size: 15px; line-height: 1.4; display: inline-block; max-width: 85%; }
+        /* Главное исправление для списков и переносов */
+        .message-text { 
+            padding: 12px 16px; 
+            border-radius: 18px; /* Скругление облачков */
+            font-size: 15px; 
+            line-height: 1.5; 
+            display: inline-block; 
+            max-width: 88%; 
+            white-space: pre-wrap; /* СОХРАНЯЕТ НУМЕРОВАННЫЕ СПИСКИ С НОВОЙ СТРОКИ */
+            word-wrap: break-word;
+        }
         
-        /* Стили для Джейка (Нуар) */
-        .theme-jake .message-received .message-text { background: #cfd8dc; color: #263238; border-left: 4px solid #455a64; font-family: monospace; }
+        /* Скругление углов: у своих справа, у чужих слева */
+        .message-received .message-text { border-bottom-left-radius: 4px; }
+        .message-sent { text-align: right; margin-top: 10px; }
+        .message-sent .message-text { 
+            background: #2196f3; 
+            color: #fff; 
+            text-align: left; 
+            border-bottom-right-radius: 4px; 
+        }
+
+        /* Темы персонажей */
+        .theme-jake .message-received .message-text { background: #e0e0e0; color: #212121; border-left: 5px solid #455a64; font-family: 'Courier New', Courier, monospace; }
+        .theme-henri .message-received .message-text { background: #efebe9; color: #3e2723; border-left: 5px solid #8d6e63; font-family: 'Georgia', serif; }
+
+        /* Темная тема (Ночной режим) */
+        body.layout-dark .panel { background: #212121; color: #fff; }
+        body.layout-dark .page { background: #121212; }
+        body.layout-dark .theme-jake .message-received .message-text { background: #263238; color: #cfd8dc; }
+        body.layout-dark .theme-henri .message-received .message-text { background: #3e2723; color: #d7ccc8; }
         
-        /* Стили для Анри (Винтаж) */
-        .theme-henri .message-received .message-text { background: #d7ccc8; color: #3e2723; border-left: 4px solid #8d6e63; font-family: serif; }
+        #typing-notice { padding: 8px 20px; font-size: 12px; font-style: italic; opacity: 0.6; display: none; }
         
-        .message-sent { text-align: right; }
-        .message-sent .message-text { background: #2196f3; color: #fff; text-align: left; }
-        
-        #typing-notice { padding: 5px 20px; font-size: 12px; font-style: italic; opacity: 0.6; display: none; }
-        .panel { background: #f5f5f5; }
-        .theme-dark { background: #212121 !important; color: #fff; }
+        /* Заголовок боковой панели */
+        .side-header { padding: 20px; background: #2196f3; color: #fff; margin-bottom: 10px; }
     </style>
 </head>
 <body class="layout-dark"> <div class="panel-overlay"></div>
 
     <div class="panel panel-left panel-cover">
-        <div class="content-block-title">Настройки</div>
+        <div class="side-header">
+            <h3>Настройки дела</h3>
+        </div>
+        
+        <div class="content-block-title">Режим экрана</div>
         <div class="list-block">
             <ul>
                 <li>
                     <div class="item-content">
                         <div class="item-inner">
-                            <div class="item-title">Джейк Трент</div>
+                            <div class="item-title">Ночной режим</div>
                             <div class="item-after">
-                                <label class="label-radio">
-                                    <input type="radio" name="char-radio" value="Jake" checked="checked" onchange="switchChar('Jake')">
-                                    <div class="item-media"><i class="icon icon-form-radio"></i></div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <div class="item-title">Анри Делакруа</div>
-                            <div class="item-after">
-                                <label class="label-radio">
-                                    <input type="radio" name="char-radio" value="Henri" onchange="switchChar('Henri')">
-                                    <div class="item-media"><i class="icon icon-form-radio"></i></div>
+                                <label class="label-switch">
+                                    <input type="checkbox" id="dark-toggle" checked onchange="toggleNight()">
+                                    <div class="checkbox"></div>
                                 </label>
                             </div>
                         </div>
@@ -63,8 +74,41 @@
                 </li>
             </ul>
         </div>
+
+        <div class="content-block-title">Персонаж</div>
+        <div class="list-block">
+            <ul>
+                <li><label class="label-radio item-content">
+                    <input type="radio" name="char" value="Jake" checked onchange="switchChar('Jake')">
+                    <div class="item-inner"><div class="item-title">Джейк Трент</div></div>
+                </label></li>
+                <li><label class="label-radio item-content">
+                    <input type="radio" name="char" value="Henri" onchange="switchChar('Henri')">
+                    <div class="item-inner"><div class="item-title">Анри Делакруа</div></div>
+                </label></li>
+            </ul>
+        </div>
+
+        <div class="content-block-title">Сложность</div>
+        <div class="list-block">
+            <ul>
+                <li><label class="label-radio item-content">
+                    <input type="radio" name="lv" value="1" checked onchange="setLv(1)">
+                    <div class="item-inner"><div class="item-title">Стандарт (С подсказками)</div></div>
+                </label></li>
+                <li><label class="label-radio item-content">
+                    <input type="radio" name="lv" value="2" onchange="setLv(2)">
+                    <div class="item-inner"><div class="item-title">Нуар (Скрытые улики)</div></div>
+                </label></li>
+                <li><label class="label-radio item-content">
+                    <input type="radio" name="lv" value="3" onchange="setLv(3)">
+                    <div class="item-inner"><div class="item-title">Мастер (Только логика)</div></div>
+                </label></li>
+            </ul>
+        </div>
+        
         <div class="content-block">
-            <p><a href="#" class="button close-panel">Готово</a></p>
+            <a href="#" class="button button-raised close-panel">Принять</a>
         </div>
     </div>
 
@@ -77,19 +121,18 @@
                         <div class="navbar-inner">
                             <div class="left"><a href="#" class="open-panel link icon-only">☰</a></div>
                             <div class="center" id="main-title">Джейк Трент</div>
-                            <div class="right"></div>
+                            <div class="right"><span id="lv-badge" style="padding-right:10px; font-weight:bold; color:#2196f3;">LV 1</span></div>
                         </div>
                     </div>
 
                     <div class="page-content" id="chat-scroller">
-                        <div class="content-block" id="chat-box">
-                            </div>
-                        <div id="typing-notice">Детектив пишет...</div>
+                        <div class="content-block" id="chat-box" style="margin-top:10px;"></div>
+                        <div id="typing-notice">Детектив обдумывает детали...</div>
                     </div>
 
                     <div class="toolbar messagebar">
                         <div class="toolbar-inner">
-                            <textarea id="msg-input" placeholder="Ваше сообщение..."></textarea>
+                            <textarea id="msg-input" placeholder="Напишите ответ..."></textarea>
                             <a href="#" class="link" onclick="handleSend()">ОТПРАВИТЬ</a>
                         </div>
                     </div>
@@ -102,24 +145,31 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/js/framework7.min.js"></script>
     
     <script>
-        var myApp = new Framework7({
-            material: true // Включаем Material Design режим
-        });
-
+        var myApp = new Framework7({ material: true });
         var state = { char: 'Jake', lv: 1 };
+        
         var chatHistories = {
-            Jake: [{ text: "Слушаю, приятель. О чем пойдет речь?", type: 'received' }],
-            Henri: [{ text: "Мой друг, я готов выслушать вашу историю. Начнем?", type: 'received' }]
+            Jake: [{ text: "Слушаю, приятель. Какое дело у нас на повестке?", type: 'received' }],
+            Henri: [{ text: "Я весь во внимании, мой друг. Какую тайну мы затронем сегодня?", type: 'received' }]
         };
 
-        // Смена персонажа
+        function toggleNight() {
+            var isDark = document.getElementById('dark-toggle').checked;
+            if (isDark) document.body.classList.add('layout-dark');
+            else document.body.classList.remove('layout-dark');
+        }
+
         function switchChar(id) {
             state.char = id;
             document.getElementById('main-title').innerText = (id === 'Jake' ? 'Джейк Трент' : 'Анри Делакруа');
             renderHistory();
         }
 
-        // Отрисовка истории
+        function setLv(n) {
+            state.lv = n;
+            document.getElementById('lv-badge').innerText = 'LV ' + n;
+        }
+
         function renderHistory() {
             var box = document.getElementById('chat-box');
             box.innerHTML = '';
@@ -129,7 +179,6 @@
             }
         }
 
-        // Функция отрисовки сообщения
         function draw(text, type) {
             var box = document.getElementById('chat-box');
             var charClass = (state.char === 'Jake') ? 'theme-jake' : 'theme-henri';
@@ -137,37 +186,25 @@
                        '<div class="message-text">' + text + '</div>' +
                        '</div>';
             box.insertAdjacentHTML('beforeend', html);
-            
-            // Скролл вниз
-            var scroller = document.getElementById('chat-scroller');
-            scroller.scrollTop = scroller.scrollHeight;
+            document.getElementById('chat-scroller').scrollTop = 999999;
         }
 
-        // Отправка данных на Render
         async function handleSend() {
             var input = document.getElementById('msg-input');
             var text = input.value.trim();
             if (!text) return;
 
-            // 1. Показываем сообщение пользователя
             chatHistories[state.char].push({ text: text, type: 'sent' });
             draw(text, 'sent');
             input.value = '';
-
-            // 2. Индикатор загрузки
             document.getElementById('typing-notice').style.display = 'block';
 
             try {
-                // Подготовка истории для API (убираем системные пометки)
-                var cleanHistory = chatHistories[state.char].slice(-10); 
-                
+                var cleanHistory = chatHistories[state.char].slice(-10);
                 var response = await fetch('https://logic-q6qn.onrender.com/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        char_id: state.char + state.lv,
-                        history: cleanHistory
-                    })
+                    body: JSON.stringify({ char_id: state.char + state.lv, history: cleanHistory })
                 });
 
                 var data = await response.json();
@@ -179,11 +216,10 @@
                 }
             } catch (e) {
                 document.getElementById('typing-notice').style.display = 'none';
-                draw("Ошибка связи с детективом. Проверьте сервер.", 'received');
+                draw("Связь прервана. Попробуйте снова.", 'received');
             }
         }
 
-        // Первичная отрисовка
         renderHistory();
     </script>
 </body>
