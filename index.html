@@ -8,71 +8,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.colors.min.css">
     
     <style>
-        /* ИСПРАВЛЕНИЕ ТЕМНОЙ ТЕМЫ ДЛЯ ВВОДА */
-        body.layout-dark .messagebar { background: #1a1a1a; border-top: 1px solid #333; }
-        body.layout-dark .messagebar textarea { 
-            background: #2c2c2c !important; 
-            color: #ffffff !important; 
-            border: 1px solid #444 !important;
+        /* УВЕЛИЧЕННЫЕ ШРИФТЫ НА ПЕРВОЙ СТРАНИЦЕ */
+        .welcome-screen { padding: 25px 20px; text-align: center; }
+        .welcome-text p { 
+            font-size: 18px; /* Крупнее для приветствия */
+            line-height: 1.6; 
+            margin-bottom: 22px; 
+            text-align: left;
         }
-        
-        /* ОВАЛЬНЫЙ КОНТУР ПОЛЯ ВВОДА */
-        .messagebar textarea {
-            border-radius: 25px !important;
-            padding: 10px 18px !important;
-            height: 40px !important;
-            margin-top: 5px;
-            font-size: 16px;
-        }
+        .item-title { font-size: 18px !important; font-weight: 500; }
+        .accordion-item-content { font-size: 16px !important; padding: 15px !important; line-height: 1.5; }
 
-        /* ОТСТУП СНИЗУ, ЧТОБЫ ТЕКСТ НЕ ПЕРЕКРЫВАЛСЯ */
-        .page-content { padding-bottom: 80px !important; }
-
-        /* СТИЛИ СООБЩЕНИЙ */
-        .message { margin-bottom: 15px; clear: both; width: 100%; display: block; }
+        /* ЧАТ: ШРИФТЫ И ШИРИНА */
         .message-text { 
-            padding: 12px 18px; 
-            border-radius: 20px; 
-            font-size: 15px; 
+            font-size: 17px !important; /* Увеличил шрифт в чате */
             line-height: 1.5; 
-            display: inline-block;
+            padding: 14px 18px;
+            border-radius: 20px; 
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-        .message-received { float: left; text-align: left; }
+
+        /* СООБЩЕНИЯ БОТА: ПОЧТИ ВО ВСЮ ШИРИНУ (96%) */
+        .message-received { float: left; width: 100%; margin-bottom: 10px; }
         .message-received .message-text { 
-            max-width: 90%; 
+            max-width: 96% !important; 
             background: #ffffff; 
             color: #333; 
             border: 1px solid #b0bec5; 
             border-bottom-left-radius: 4px; 
         }
-        body.layout-dark .message-received .message-text { background: #263238; color: #eceff1; border-color: #455a64; }
 
-        .message-sent { float: right; text-align: right; }
-        .message-sent .message-text { background: #2196f3; color: #fff; border-bottom-right-radius: 4px; }
+        /* СООБЩЕНИЯ ПОЛЬЗОВАТЕЛЯ */
+        .message-sent { float: right; width: 100%; text-align: right; margin-bottom: 10px; }
+        .message-sent .message-text { 
+            max-width: 85%; 
+            background: #2196f3; 
+            color: #fff; 
+            border-bottom-right-radius: 4px; 
+            text-align: left;
+        }
 
-        /* ПРИВЕТСТВЕННЫЙ ЭКРАН */
-        .welcome-screen { padding: 20px; text-align: center; }
-        .welcome-text { text-align: left; line-height: 1.6; margin-bottom: 20px; }
-        .accordion-item-content { padding: 10px 15px; font-size: 14px; opacity: 0.9; }
+        /* ТЕМНАЯ ТЕМА И ВВОД */
+        body.layout-dark .messagebar { background: #1a1a1a; }
+        body.layout-dark .messagebar textarea { 
+            background: #2c2c2c !important; 
+            color: #fff !important; 
+            border-radius: 25px !important;
+            border: 1px solid #444 !important;
+            padding: 10px 18px !important;
+        }
         
-        .send-icon { font-size: 28px; color: #2196f3; transform: rotate(-15deg); display: inline-block; }
-        #lv-badge { font-weight: bold; border: 1px solid #2196f3; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .page-content { padding-bottom: 90px !important; }
+        .send-icon { font-size: 30px; color: #2196f3; transform: rotate(-15deg); display: inline-block; }
+        #lv-badge { font-weight: bold; border: 1px solid #2196f3; padding: 3px 8px; border-radius: 6px; font-size: 13px; }
     </style>
 </head>
 <body class="layout-dark">
 
     <div class="panel-overlay"></div>
-    <div class="panel panel-left panel-cover">
-        <div style="padding: 20px; background: #2196f3; color: #fff;"><h3>Меню</h3></div>
+    
+    <div class="panel panel-left panel-cover" id="left-panel">
+        <div style="padding: 25px 20px; background: #2196f3; color: #fff;">
+            <h3 style="margin:0">Меню дела</h3>
+        </div>
         <div class="list-block">
             <ul>
                 <li><div class="item-content"><div class="item-inner">
                     <div class="item-title">Ночной режим</div>
-                    <div class="item-after"><label class="label-switch"><input type="checkbox" id="dark-toggle" checked onchange="toggleNight()"><div class="checkbox"></div></label></div>
+                    <div class="item-after">
+                        <label class="label-switch">
+                            <input type="checkbox" id="dark-toggle" checked onchange="toggleNight()">
+                            <div class="checkbox"></div>
+                        </label>
+                    </div>
                 </div></div></li>
-                <li><a href="#" class="item-link list-button close-panel" onclick="showWelcome()">Вернуться к описанию</a></li>
+            </ul>
+        </div>
+        <div class="content-block-title">Сложность</div>
+        <div class="list-block">
+            <ul>
+                <li><label class="label-radio item-content"><input type="radio" name="lv" value="1" checked onchange="setLv(1)"><div class="item-inner"><div class="item-title">LV 1 - Стандарт</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="lv" value="2" onchange="setLv(2)"><div class="item-inner"><div class="item-title">LV 2 - Нуар</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="lv" value="3" onchange="setLv(3)"><div class="item-inner"><div class="item-title">LV 3 - Мастер</div></div></label></li>
+            </ul>
+        </div>
+        <div class="list-block">
+            <ul>
+                <li><a href="#" class="item-link list-button close-panel" onclick="showWelcome()">К описанию</a></li>
             </ul>
         </div>
     </div>
@@ -81,15 +104,17 @@
         <div class="view view-main">
             <div class="pages navbar-fixed toolbar-fixed">
                 
-                <div data-page="welcome" class="page" id="page-welcome">
+                <div data-page="welcome" class="page">
                     <div class="navbar">
-                        <div class="navbar-inner"><div class="center">Интеллектуальные расследования</div></div>
+                        <div class="navbar-inner">
+                            <div class="center">Интеллектуальные расследования</div>
+                        </div>
                     </div>
                     <div class="page-content">
                         <div class="welcome-screen">
                             <div class="welcome-text">
                                 <p>Это не игра на скорость. И не тест на эрудицию. Здесь нет насилия, стрельбы и случайных побед.</p>
-                                <p>Каждое дело — это диалог, наблюдение и вывод. Ты выбираешь персонажа — а вместе с ним способ мышления, интонацию и взгляд на мир.</p>
+                                <p>Каждое дело — это диалог, наблюдение и вывод. Ты выбираешь персонажа — а вместе с ним способ мышления и интонацию.</p>
                             </div>
 
                             <div class="list-block accordion-list">
@@ -99,8 +124,8 @@
                                             <div class="item-inner"><div class="item-title">ПЕРСОНАЖИ</div></div>
                                         </a>
                                         <div class="accordion-item-content">
-                                            <p><b>Джейк Трент:</b> Частный детектив (Нуар). Дождь, тени, сигаретный дым. Говорит прямо. Думает мрачно. Ошибается редко.</p>
-                                            <p><b>Анри Делакруа:</b> Французский следователь. Внимателен к деталям, ироничен. Замечает то, что другие считают неважным.</p>
+                                            <p><b>Джейк Трент:</b> Частный детектив (Нуар). Дождь, тени, дым. Говорит прямо. Ошибается редко.</p>
+                                            <p><b>Анри Делакруа:</b> Французский следователь. Внимателен к деталям, ироничен. Замечает неявное.</p>
                                         </div>
                                     </li>
                                     <li class="accordion-item">
@@ -114,24 +139,27 @@
                                 </ul>
                             </div>
 
-                            <div class="content-block">
+                            <div class="content-block" style="margin-top:40px">
                                 <a href="#" class="button button-big button-raised button-fill" onclick="startApp()">Начать расследование</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div data-page="index" class="page cached" id="page-chat">
+                <div data-page="index" class="page cached">
                     <div class="navbar">
                         <div class="navbar-inner">
-                            <div class="left"><a href="#" class="open-panel link">☰</a></div>
+                            <div class="left">
+                                <a href="#" class="link icon-only open-panel">
+                                    <i class="icon icon-bars"></i> </a>
+                            </div>
                             <div class="center" id="main-title">Джейк Трент</div>
                             <div class="right" style="padding-right:15px;"><span id="lv-badge">LV 1</span></div>
                         </div>
                     </div>
                     <div class="page-content" id="chat-scroller">
-                        <div id="chat-box" style="padding: 10px 8px;"></div>
-                        <div id="typing-notice" style="padding: 10px; font-style: italic; opacity: 0.5; display: none;">Размышление...</div>
+                        <div id="chat-box" style="padding: 15px 10px;"></div>
+                        <div id="typing-notice" style="padding: 10px; font-style: italic; opacity: 0.5; display: none; font-size: 16px;">Размышление...</div>
                     </div>
                     <div class="toolbar messagebar">
                         <div class="toolbar-inner">
@@ -147,14 +175,19 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/js/framework7.min.js"></script>
     <script>
-        var myApp = new Framework7({ material: true });
+        var myApp = new Framework7({ 
+            material: true,
+            swipePanel: 'left' // Можно открывать меню свайпом
+        });
         var mainView = myApp.addView('.view-main');
         var state = { char: 'Jake', lv: 1 };
         var chatHistories = { Jake: [], Henri: [] };
 
         function startApp() {
             mainView.router.load({pageName: 'index'});
-            if(chatHistories[state.char].length === 0) renderHistory();
+            if(chatHistories[state.char].length === 0) {
+                setTimeout(renderHistory, 300); // Небольшая пауза для плавной анимации
+            }
         }
 
         function showWelcome() {
@@ -166,19 +199,21 @@
             else document.body.classList.remove('layout-dark');
         }
 
+        function setLv(n) {
+            state.lv = n;
+            document.getElementById('lv-badge').innerText = 'LV ' + n;
+        }
+
         function draw(text, type) {
             var box = document.getElementById('chat-box');
             var html = '<div class="message message-' + type + '"><div class="message-text">' + text + '</div></div>';
             box.insertAdjacentHTML('beforeend', html);
             
-            // ИСПРАВЛЕННЫЙ СКРОЛЛ: Показываем начало длинного сообщения
             var scroller = document.getElementById('chat-scroller');
             if(type === 'sent') {
                 scroller.scrollTop = scroller.scrollHeight; 
             } else {
-                // Если пришел ответ от бота, скроллим так, чтобы видеть новое сообщение сверху
-                var lastMsg = box.lastElementChild;
-                lastMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                box.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
