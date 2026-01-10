@@ -4,39 +4,45 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Logic Detective TWA</title>
+  <title>Logic Detective</title>
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8.3.3/framework7-bundle.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:ital@1&family=Courier+Prime&display=swap" rel="stylesheet">
   
   <style>
+    /* Базовый фон, чтобы не было белого экрана при загрузке */
     :root { --f7-theme-color: #2196f3; }
+    html, body { background: #121212; color: #ffffff; margin: 0; padding: 0; height: 100%; overflow: hidden; }
     
-    /* Стилизация в духе Material Design 3 */
+    #app { background: #121212; }
+
+    /* Стилизация сообщений */
     .message-text { 
-        font-family: 'Roboto', sans-serif; 
-        box-shadow: var(--f7-card-shadow); 
+        font-size: 16px;
         border-radius: 12px !important; 
+        line-height: 1.4;
     }
     
-    /* Темная тема для Нуара */
     .theme-jake .message-received .message-text {
-        background: #263238; color: #eceff1; font-family: 'Courier Prime', monospace;
+        background: #1e272e; color: #dcdde1; border-left: 4px solid #487eb0;
     }
     
-    /* Светлая/Винтажная тема для Анри */
     .theme-henri .message-received .message-text {
-        background: #efebe9; color: #3e2723; font-family: 'Playfair Display', serif;
+        background: #2f2f2f; color: #f5f6fa; border-left: 4px solid #e1b12c;
     }
 
-    .message-sent .message-text { background: var(--f7-theme-color); color: #fff; }
+    .message-sent .message-text { background: #2196f3; color: #fff; }
 
-    #typing-status { font-size: 12px; margin-left: 20px; font-style: italic; display: none; }
+    #typing-status { font-size: 12px; margin-left: 20px; font-style: italic; display: none; color: #aaa; }
     
-    .logo-area { padding: 40px 20px; text-align: center; background: var(--f7-theme-color); color: #fff; }
+    .logo-area { padding: 40px 20px; text-align: center; background: #1976d2; color: #fff; }
+    
+    /* Убираем лишние отступы в Material теме */
+    .messages { background: transparent !important; }
   </style>
 </head>
-<body class="theme-dark"> <div id="app">
+<body class="theme-dark">
+
+  <div id="app">
     <div class="panel panel-left panel-cover">
       <div class="page">
         <div class="logo-area">
@@ -88,7 +94,7 @@
             <div class="messagebar-area">
               <textarea id="msg-input" placeholder="Введите сообщение..."></textarea>
             </div>
-            <a href="#" class="link icon-only" onclick="handleSend()">🚀</a>
+            <a href="#" class="link" onclick="handleSend()" style="font-weight: bold; padding: 0 10px;">ОТПРАВИТЬ</a>
           </div>
         </div>
 
@@ -101,10 +107,21 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/framework7@8.3.3/framework7-bundle.min.js"></script>
+  
   <script>
-    const app = new Framework7({ root: '#app', theme: 'md' });
+    // Инициализация только после загрузки документа
+    document.addEventListener('DOMContentLoaded', function () {
+        const app = new Framework7({ 
+            root: '#app', 
+            theme: 'md',
+            touch: { tapHold: true }
+        });
+
+        window.f7App = app; // сохраняем ссылку для отладки
+        setChar('Jake');
+    });
+
     let state = { char: 'Jake', lv: 1 };
-    
     let chatHistories = {
       Jake: [{ text: "Слушаю, приятель. О каком деле пойдет речь?", type: 'welcome' }],
       Henri: [{ text: "Мой друг, я готов выслушать вашу историю. Начнем?", type: 'welcome' }]
@@ -112,8 +129,9 @@
 
     function toggleTheme() {
         const isDark = document.getElementById('theme-switch').checked;
-        if(isDark) document.getElementById('app').classList.add('theme-dark');
-        else document.getElementById('app').classList.remove('theme-dark');
+        const appEl = document.getElementById('app');
+        if(isDark) appEl.classList.add('theme-dark');
+        else appEl.classList.remove('theme-dark');
     }
 
     function setChar(id) {
@@ -132,19 +150,27 @@
 
     function draw(text, type, anim = true) {
         const box = document.getElementById('chat-box');
-        const msgHtml = `<div class="message message-${type}"><div class="message-content"><div class="message-text"></div></div></div>`;
+        const msgHtml = '<div class="message message-' + type + '"><div class="message-content"><div class="message-text"></div></div></div>';
         box.insertAdjacentHTML('beforeend', msgHtml);
-        const target = box.lastChild.querySelector('.message-text');
+        const target = box.lastElementChild.querySelector('.message-text');
         
         if(type === 'received' && anim) {
             let i = 0;
             function typeWriter() {
-                if (i < text.length) { target.textContent += text.charAt(i); i++; setTimeout(typeWriter, 15); }
+                if (i < text.length) { 
+                    target.textContent += text.charAt(i); 
+                    i++; 
+                    setTimeout(typeWriter, 15); 
+                }
             }
             typeWriter();
-        } else { target.textContent = text; }
+        } else { 
+            target.textContent = text; 
+        }
         
-        document.querySelector('.messages-content').scrollTop = 100000;
+        // Прокрутка
+        const container = document.querySelector('.messages-content');
+        container.scrollTop = container.scrollHeight;
     }
 
     async function handleSend() {
@@ -152,7 +178,7 @@
         const text = inp.value.trim();
         if(!text) return;
 
-        chatHistories[state.char].push({ text, type: 'sent' });
+        chatHistories[state.char].push({ text: text, type: 'sent' });
         draw(text, 'sent', false);
         inp.value = '';
 
@@ -167,16 +193,15 @@
             });
             const data = await res.json();
             document.getElementById('typing-status').style.display = 'none';
-            chatHistories[state.char].push({ text: data.reply, type: 'received' });
-            draw(data.reply, 'received', true);
+            
+            const reply = data.reply || "Детектив молчит...";
+            chatHistories[state.char].push({ text: reply, type: 'received' });
+            draw(reply, 'received', true);
         } catch(e) {
             document.getElementById('typing-status').style.display = 'none';
-            draw("Ошибка связи с базой данных...", 'received');
+            draw("Ошибка связи с базой данных. Проверьте интернет.", 'received');
         }
     }
-
-    // Инициализация при загрузке
-    setChar('Jake');
   </script>
 </body>
 </html>
