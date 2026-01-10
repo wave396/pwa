@@ -1,208 +1,191 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Logic Detective</title>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8.3.3/framework7-bundle.min.css">
-  
-  <style>
-    /* Базовый фон, чтобы не было белого экрана при загрузке */
-    :root { --f7-theme-color: #2196f3; }
-    html, body { background: #121212; color: #ffffff; margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>Logic Detective PWA</title>
     
-    #app { background: #121212; }
-
-    /* Стилизация сообщений */
-    .message-text { 
-        font-size: 16px;
-        border-radius: 12px !important; 
-        line-height: 1.4;
-    }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.colors.min.css">
     
-    .theme-jake .message-received .message-text {
-        background: #1e272e; color: #dcdde1; border-left: 4px solid #487eb0;
-    }
-    
-    .theme-henri .message-received .message-text {
-        background: #2f2f2f; color: #f5f6fa; border-left: 4px solid #e1b12c;
-    }
-
-    .message-sent .message-text { background: #2196f3; color: #fff; }
-
-    #typing-status { font-size: 12px; margin-left: 20px; font-style: italic; display: none; color: #aaa; }
-    
-    .logo-area { padding: 40px 20px; text-align: center; background: #1976d2; color: #fff; }
-    
-    /* Убираем лишние отступы в Material теме */
-    .messages { background: transparent !important; }
-  </style>
+    <style>
+        /* Кастомные правки для атмосферы */
+        .message { margin-bottom: 15px; }
+        .message-text { padding: 10px 15px; border-radius: 8px; font-size: 15px; line-height: 1.4; display: inline-block; max-width: 85%; }
+        
+        /* Стили для Джейка (Нуар) */
+        .theme-jake .message-received .message-text { background: #cfd8dc; color: #263238; border-left: 4px solid #455a64; font-family: monospace; }
+        
+        /* Стили для Анри (Винтаж) */
+        .theme-henri .message-received .message-text { background: #d7ccc8; color: #3e2723; border-left: 4px solid #8d6e63; font-family: serif; }
+        
+        .message-sent { text-align: right; }
+        .message-sent .message-text { background: #2196f3; color: #fff; text-align: left; }
+        
+        #typing-notice { padding: 5px 20px; font-size: 12px; font-style: italic; opacity: 0.6; display: none; }
+        .panel { background: #f5f5f5; }
+        .theme-dark { background: #212121 !important; color: #fff; }
+    </style>
 </head>
-<body class="theme-dark">
+<body class="layout-dark"> <div class="panel-overlay"></div>
 
-  <div id="app">
     <div class="panel panel-left panel-cover">
-      <div class="page">
-        <div class="logo-area">
-          <h2 style="margin:0">Detective</h2>
-          <p style="opacity:0.8">Настройки дела</p>
-        </div>
-        <div class="page-content">
-          <div class="list no-hairlines">
+        <div class="content-block-title">Настройки</div>
+        <div class="list-block">
             <ul>
-              <li>
-                <div class="item-content">
-                  <div class="item-inner">
-                    <div class="item-title">Ночной режим</div>
-                    <div class="item-after">
-                      <label class="toggle toggle-init">
-                        <input type="checkbox" id="theme-switch" checked onchange="toggleTheme()">
-                        <span class="toggle-icon"></span>
-                      </label>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title">Джейк Трент</div>
+                            <div class="item-after">
+                                <label class="label-radio">
+                                    <input type="radio" name="char-radio" value="Jake" checked="checked" onchange="switchChar('Jake')">
+                                    <div class="item-media"><i class="icon icon-form-radio"></i></div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                  </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title">Анри Делакруа</div>
+                            <div class="item-after">
+                                <label class="label-radio">
+                                    <input type="radio" name="char-radio" value="Henri" onchange="switchChar('Henri')">
+                                    <div class="item-media"><i class="icon icon-form-radio"></i></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content-block">
+            <p><a href="#" class="button close-panel">Готово</a></p>
+        </div>
+    </div>
+
+    <div class="views">
+        <div class="view view-main">
+            <div class="pages navbar-fixed toolbar-fixed">
+                <div data-page="index" class="page">
+                    
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left"><a href="#" class="open-panel link icon-only">☰</a></div>
+                            <div class="center" id="main-title">Джейк Трент</div>
+                            <div class="right"></div>
+                        </div>
+                    </div>
+
+                    <div class="page-content" id="chat-scroller">
+                        <div class="content-block" id="chat-box">
+                            </div>
+                        <div id="typing-notice">Детектив пишет...</div>
+                    </div>
+
+                    <div class="toolbar messagebar">
+                        <div class="toolbar-inner">
+                            <textarea id="msg-input" placeholder="Ваше сообщение..."></textarea>
+                            <a href="#" class="link" onclick="handleSend()">ОТПРАВИТЬ</a>
+                        </div>
+                    </div>
+
                 </div>
-              </li>
-            </ul>
-          </div>
-          
-          <div class="block-title">Персонаж</div>
-          <div class="list">
-            <ul>
-              <li><label class="item-radio item-content"><input type="radio" name="char" value="Jake" checked onclick="setChar('Jake')"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Джейк (Нуар)</div></div></label></li>
-              <li><label class="item-radio item-content"><input type="radio" name="char" value="Henri" onclick="setChar('Henri')"/><i class="icon icon-radio"></i><div class="item-inner"><div class="item-title">Анри (Винтаж)</div></div></label></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="view view-main">
-      <div class="page">
-        <div class="navbar">
-          <div class="navbar-bg"></div>
-          <div class="navbar-inner">
-            <div class="left"><a href="#" class="panel-open link icon-only" data-panel="left">☰</a></div>
-            <div class="title" id="nav-title">Джейк Трент</div>
-          </div>
-        </div>
-
-        <div class="toolbar messagebar toolbar-bottom">
-          <div class="toolbar-inner">
-            <div class="messagebar-area">
-              <textarea id="msg-input" placeholder="Введите сообщение..."></textarea>
             </div>
-            <a href="#" class="link" onclick="handleSend()" style="font-weight: bold; padding: 0 10px;">ОТПРАВИТЬ</a>
-          </div>
         </div>
-
-        <div class="page-content messages-content" id="chat-container">
-          <div id="typing-status">Детектив размышляет...</div>
-          <div class="messages" id="chat-box"></div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/framework7@8.3.3/framework7-bundle.min.js"></script>
-  
-  <script>
-    // Инициализация только после загрузки документа
-    document.addEventListener('DOMContentLoaded', function () {
-        const app = new Framework7({ 
-            root: '#app', 
-            theme: 'md',
-            touch: { tapHold: true }
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/js/framework7.min.js"></script>
+    
+    <script>
+        var myApp = new Framework7({
+            material: true // Включаем Material Design режим
         });
 
-        window.f7App = app; // сохраняем ссылку для отладки
-        setChar('Jake');
-    });
+        var state = { char: 'Jake', lv: 1 };
+        var chatHistories = {
+            Jake: [{ text: "Слушаю, приятель. О чем пойдет речь?", type: 'received' }],
+            Henri: [{ text: "Мой друг, я готов выслушать вашу историю. Начнем?", type: 'received' }]
+        };
 
-    let state = { char: 'Jake', lv: 1 };
-    let chatHistories = {
-      Jake: [{ text: "Слушаю, приятель. О каком деле пойдет речь?", type: 'welcome' }],
-      Henri: [{ text: "Мой друг, я готов выслушать вашу историю. Начнем?", type: 'welcome' }]
-    };
+        // Смена персонажа
+        function switchChar(id) {
+            state.char = id;
+            document.getElementById('main-title').innerText = (id === 'Jake' ? 'Джейк Трент' : 'Анри Делакруа');
+            renderHistory();
+        }
 
-    function toggleTheme() {
-        const isDark = document.getElementById('theme-switch').checked;
-        const appEl = document.getElementById('app');
-        if(isDark) appEl.classList.add('theme-dark');
-        else appEl.classList.remove('theme-dark');
-    }
-
-    function setChar(id) {
-        state.char = id;
-        document.getElementById('nav-title').innerText = id === 'Jake' ? 'Джейк Трент' : 'Анри Делакруа';
-        const container = document.getElementById('chat-container');
-        container.className = 'page-content messages-content theme-' + id.toLowerCase();
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const box = document.getElementById('chat-box');
-        box.innerHTML = '';
-        chatHistories[state.char].forEach(m => draw(m.text, m.type === 'welcome' ? 'received' : m.type, false));
-    }
-
-    function draw(text, type, anim = true) {
-        const box = document.getElementById('chat-box');
-        const msgHtml = '<div class="message message-' + type + '"><div class="message-content"><div class="message-text"></div></div></div>';
-        box.insertAdjacentHTML('beforeend', msgHtml);
-        const target = box.lastElementChild.querySelector('.message-text');
-        
-        if(type === 'received' && anim) {
-            let i = 0;
-            function typeWriter() {
-                if (i < text.length) { 
-                    target.textContent += text.charAt(i); 
-                    i++; 
-                    setTimeout(typeWriter, 15); 
-                }
+        // Отрисовка истории
+        function renderHistory() {
+            var box = document.getElementById('chat-box');
+            box.innerHTML = '';
+            var hist = chatHistories[state.char];
+            for (var i = 0; i < hist.length; i++) {
+                draw(hist[i].text, hist[i].type);
             }
-            typeWriter();
-        } else { 
-            target.textContent = text; 
         }
-        
-        // Прокрутка
-        const container = document.querySelector('.messages-content');
-        container.scrollTop = container.scrollHeight;
-    }
 
-    async function handleSend() {
-        const inp = document.getElementById('msg-input');
-        const text = inp.value.trim();
-        if(!text) return;
-
-        chatHistories[state.char].push({ text: text, type: 'sent' });
-        draw(text, 'sent', false);
-        inp.value = '';
-
-        document.getElementById('typing-status').style.display = 'block';
-
-        try {
-            const hist = chatHistories[state.char].filter(m => m.type !== 'welcome');
-            const res = await fetch('https://logic-q6qn.onrender.com/api/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ char_id: state.char + state.lv, history: hist })
-            });
-            const data = await res.json();
-            document.getElementById('typing-status').style.display = 'none';
+        // Функция отрисовки сообщения
+        function draw(text, type) {
+            var box = document.getElementById('chat-box');
+            var charClass = (state.char === 'Jake') ? 'theme-jake' : 'theme-henri';
+            var html = '<div class="message message-' + type + ' ' + charClass + '">' +
+                       '<div class="message-text">' + text + '</div>' +
+                       '</div>';
+            box.insertAdjacentHTML('beforeend', html);
             
-            const reply = data.reply || "Детектив молчит...";
-            chatHistories[state.char].push({ text: reply, type: 'received' });
-            draw(reply, 'received', true);
-        } catch(e) {
-            document.getElementById('typing-status').style.display = 'none';
-            draw("Ошибка связи с базой данных. Проверьте интернет.", 'received');
+            // Скролл вниз
+            var scroller = document.getElementById('chat-scroller');
+            scroller.scrollTop = scroller.scrollHeight;
         }
-    }
-  </script>
+
+        // Отправка данных на Render
+        async function handleSend() {
+            var input = document.getElementById('msg-input');
+            var text = input.value.trim();
+            if (!text) return;
+
+            // 1. Показываем сообщение пользователя
+            chatHistories[state.char].push({ text: text, type: 'sent' });
+            draw(text, 'sent');
+            input.value = '';
+
+            // 2. Индикатор загрузки
+            document.getElementById('typing-notice').style.display = 'block';
+
+            try {
+                // Подготовка истории для API (убираем системные пометки)
+                var cleanHistory = chatHistories[state.char].slice(-10); 
+                
+                var response = await fetch('https://logic-q6qn.onrender.com/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: state.char + state.lv,
+                        history: cleanHistory
+                    })
+                });
+
+                var data = await response.json();
+                document.getElementById('typing-notice').style.display = 'none';
+
+                if (data.reply) {
+                    chatHistories[state.char].push({ text: data.reply, type: 'received' });
+                    draw(data.reply, 'received');
+                }
+            } catch (e) {
+                document.getElementById('typing-notice').style.display = 'none';
+                draw("Ошибка связи с детективом. Проверьте сервер.", 'received');
+            }
+        }
+
+        // Первичная отрисовка
+        renderHistory();
+    </script>
 </body>
 </html>
 
