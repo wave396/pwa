@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.colors.min.css">
     
     <style>
-        .message { margin-bottom: 12px; clear: both; }
+        /* Общие стили сообщений */
+        .message { margin-bottom: 14px; clear: both; display: block; width: 100%; }
         .message-text { 
             padding: 12px 16px; 
             border-radius: 20px; 
@@ -17,31 +18,68 @@
             display: inline-block; 
             white-space: pre-wrap;
             word-wrap: break-word;
-            border: 1px solid rgba(0,0,0,0.1); /* Контур для светлой темы */
         }
-        
-        /* Ширина сообщений бота */
-        .message-received { float: left; width: 100%; }
-        .message-received .message-text { max-width: 92%; border-bottom-left-radius: 4px; }
-        
-        /* Сообщения пользователя */
-        .message-sent { float: right; width: 100%; text-align: right; }
+
+        /* Сообщения БОТА: Широкие и с контуром */
+        .message-received { float: left; text-align: left; }
+        .message-received .message-text { 
+            max-width: 92%; 
+            background: #ffffff; 
+            color: #333; 
+            border: 1px solid #b0bec5; /* Контур для светлой темы */
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Сообщения ПОЛЬЗОВАТЕЛЯ */
+        .message-sent { float: right; text-align: right; }
         .message-sent .message-text { 
-            max-width: 85%; background: #2196f3; color: #fff; 
-            border-bottom-right-radius: 4px; border: none;
+            max-width: 85%; 
+            background: #2196f3; 
+            color: #fff; 
+            border-bottom-right-radius: 4px;
+            border: none;
         }
 
-        /* Темы */
-        .theme-jake .message-received .message-text { background: #e0e0e0; color: #212121; font-family: monospace; border-left: 6px solid #455a64; }
-        .theme-henri .message-received .message-text { background: #efebe9; color: #3e2723; font-family: serif; border-left: 6px solid #8d6e63; }
+        /* ТЕМЫ ПЕРСОНАЖЕЙ (Шрифты) */
+        .theme-jake .message-received .message-text { font-family: monospace; }
+        .theme-henri .message-received .message-text { font-family: serif; font-size: 16px; }
 
-        /* Ночной режим контуры */
-        body.layout-dark .message-received .message-text { border: 1px solid rgba(255,255,255,0.1); }
-        body.layout-dark .theme-jake .message-received .message-text { background: #263238; color: #cfd8dc; }
-        body.layout-dark .theme-henri .message-received .message-text { background: #3e2723; color: #d7ccc8; }
+        /* НОЧНОЙ РЕЖИМ */
+        body.layout-dark .message-received .message-text { 
+            background: #263238; 
+            color: #eceff1; 
+            border-color: #455a64; 
+        }
+        body.layout-dark .page, body.layout-dark .page-content { background: #121212; }
+
+        /* ИНДИКАТОР LVL В ШАПКЕ */
+        #lv-display {
+            font-weight: 700;
+            font-size: 13px;
+            border: 1px solid #2196f3;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        /* ПОЛЕ ВВОДА И СТРЕЛКА */
+        .toolbar-inner { padding: 0 8px !important; }
+        .messagebar textarea {
+            font-size: 16px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.05);
+        }
+        body.layout-dark .messagebar textarea { background: rgba(255,255,255,0.1); color: #fff; }
         
-        #typing-notice { padding: 10px; font-size: 12px; font-style: italic; opacity: 0.6; display: none; clear: both; }
-        .send-icon { font-size: 24px; line-height: 1; }
+        .send-icon {
+            font-size: 32px;
+            color: #2196f3;
+            transform: rotate(-15deg);
+            display: inline-block;
+            margin-left: 5px;
+            line-height: 1;
+        }
     </style>
 </head>
 <body class="layout-dark">
@@ -49,27 +87,26 @@
     <div class="panel-overlay"></div>
     <div class="panel panel-left panel-cover">
         <div style="padding: 20px; background: #2196f3; color: #fff;"><h3>Настройки</h3></div>
-        <div class="content-block-title">Вид</div>
         <div class="list-block">
             <ul>
-                <li><div class="item-content"><div class="item-inner"><div class="item-title">Ночной режим</div>
-                <div class="item-after"><label class="label-switch"><input type="checkbox" id="dark-toggle" checked onchange="toggleNight()"><div class="checkbox"></div></label></div>
+                <li><div class="item-content"><div class="item-inner">
+                    <div class="item-title">Ночной режим</div>
+                    <div class="item-after"><label class="label-switch"><input type="checkbox" id="dark-toggle" checked onchange="toggleNight()"><div class="checkbox"></div></label></div>
                 </div></div></li>
             </ul>
         </div>
         <div class="content-block-title">Персонаж и Сложность</div>
         <div class="list-block">
             <ul>
-                <li><label class="label-radio item-content"><input type="radio" name="char" value="Jake" checked onchange="switchChar('Jake')"><div class="item-inner"><div class="item-title">Джейк</div></div></label></li>
-                <li><label class="label-radio item-content"><input type="radio" name="char" value="Henri" onchange="switchChar('Henri')"><div class="item-inner"><div class="item-title">Анри</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="char" value="Jake" checked onchange="switchChar('Jake')"><div class="item-inner"><div class="item-title">Джейк (Нуар)</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="char" value="Henri" onchange="switchChar('Henri')"><div class="item-inner"><div class="item-title">Анри (Винтаж)</div></div></label></li>
             </ul>
             <ul style="margin-top:10px">
-                <li><label class="label-radio item-content"><input type="radio" name="lv" value="1" checked onchange="setLv(1)"><div class="item-inner"><div class="item-title">LV 1 - Легко</div></div></label></li>
-                <li><label class="label-radio item-content"><input type="radio" name="lv" value="2" onchange="setLv(2)"><div class="item-inner"><div class="item-title">LV 2 - Средне</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="lv" value="1" checked onchange="setLv(1)"><div class="item-inner"><div class="item-title">LV 1 - Стандарт</div></div></label></li>
+                <li><label class="label-radio item-content"><input type="radio" name="lv" value="2" onchange="setLv(2)"><div class="item-inner"><div class="item-title">LV 2 - Нуар</div></div></label></li>
                 <li><label class="label-radio item-content"><input type="radio" name="lv" value="3" onchange="setLv(3)"><div class="item-inner"><div class="item-title">LV 3 - Мастер</div></div></label></li>
             </ul>
         </div>
-        <div class="content-block"><a href="#" class="button button-raised close-panel">Принять</a></div>
     </div>
 
     <div class="views">
@@ -80,12 +117,12 @@
                         <div class="navbar-inner">
                             <div class="left"><a href="#" class="open-panel link">☰</a></div>
                             <div class="center" id="main-title">Джейк Трент</div>
-                            <div class="right" style="padding-right:15px; font-weight:bold; color:#2196f3" id="lv-display">LV 1</div>
+                            <div class="right" style="padding-right:15px;"><span id="lv-display">LV 1</span></div>
                         </div>
                     </div>
                     <div class="page-content" id="chat-scroller">
-                        <div id="chat-box" style="padding: 10px 5px;"></div>
-                        <div id="typing-notice">Детектив пишет...</div>
+                        <div id="chat-box" style="padding: 10px 8px;"></div>
+                        <div id="typing-notice" style="padding: 10px; font-style: italic; opacity: 0.5; display: none;">Детектив размышляет...</div>
                     </div>
                     <div class="toolbar messagebar">
                         <div class="toolbar-inner">
@@ -125,7 +162,7 @@
             var charClass = (state.char === 'Jake') ? 'theme-jake' : 'theme-henri';
             var html = '<div class="message message-' + type + ' ' + charClass + '"><div class="message-text">' + text + '</div></div>';
             box.insertAdjacentHTML('beforeend', html);
-            document.getElementById('chat-scroller').scrollTop = 99999;
+            document.getElementById('chat-scroller').scrollTop = 999999;
         }
 
         function renderHistory() {
@@ -133,8 +170,7 @@
             box.innerHTML = '';
             var h = chatHistories[state.char];
             if(h.length === 0) {
-                var welcome = state.char === 'Jake' ? "Слушаю. Что за дело?" : "Я готов начать расследование. О чем речь?";
-                draw(welcome, 'received');
+                draw(state.char === 'Jake' ? "Слушаю. Что за дело?" : "Я к вашим услугам. О чем поговорим?", 'received');
             } else {
                 for(var i=0; i<h.length; i++) draw(h[i].text, h[i].type);
             }
@@ -152,7 +188,7 @@
                 var res = await fetch('https://logic-q6qn.onrender.com/api/chat', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({char_id: state.char + state.lv, history: chatHistories[state.char]})
+                    body: JSON.stringify({char_id: state.char + state.lv, history: chatHistories[state.char].slice(-8)})
                 });
                 var data = await res.json();
                 document.getElementById('typing-notice').style.display = 'none';
