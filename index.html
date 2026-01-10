@@ -1,205 +1,58 @@
-   
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui" />
-    <title>Интеллектуальные расследования</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/css/framework7.material.colors.min.css">
-    
-    <style>
-        /* ШРИФТЫ */
-        .welcome-screen { padding: 25px 20px; text-align: left; }
-        .welcome-screen p { font-size: 19px; line-height: 1.6; margin-bottom: 20px; }
-        .item-title { font-size: 18px !important; }
-        .accordion-item-content { font-size: 17px !important; padding: 15px 20px !important; }
+  <meta charset="utf-8" />
+  <title>my-real-pwa</title>
 
-        /* ЧАТ ШРИФТЫ И ШИРИНА */
-        .message-text { font-size: 18px !important; line-height: 1.5; padding: 14px 18px; white-space: pre-wrap; word-wrap: break-word; }
-        .message-received { float: left; width: 100%; margin-bottom: 12px; }
-        .message-received .message-text { 
-            max-width: 96% !important; background: #ffffff; color: #333; 
-            border: 1px solid #b0bec5; border-bottom-left-radius: 4px; 
-        }
+  <base href="/" />
 
-        /* ТЕМНАЯ ТЕМА */
-        body.layout-dark .messagebar { background: #1a1a1a; }
-        body.layout-dark .messagebar textarea { 
-            background: #2c2c2c !important; color: #fff !important; 
-            border: 1px solid #444 !important; border-radius: 25px !important;
-        }
-        
-        /* ГЕОМЕТРИЯ */
-        .page-content { padding-bottom: 100px !important; }
-        .send-icon { font-size: 32px; color: #2196f3; transform: rotate(-15deg); display: inline-block; }
-        
-        /* СТИЛЬ ВЫБОРА НА ГЛАВНОЙ */
-        .setup-block { background: rgba(33, 150, 243, 0.1); padding: 15px; border-radius: 12px; margin: 20px 0; }
-        .setup-title { font-weight: bold; margin-bottom: 10px; display: block; font-size: 16px; color: #2196f3; }
-    </style>
+  <!-- This meta viewport ensures the webpage's dimensions change according to the device it's on. This is called Responsive Web Design.-->
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <meta name="description" content="This is a my-real-pwa app" />
+
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#181818" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f3f3" />
+
+  <!-- These meta tags are Apple-specific, and set the web application to run in full-screen mode with a black status bar. Learn more at https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="my-real-pwa" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <!-- This tag is used by the my-real-pwa CLI to identify template projects. Don't remove if you are using the CLI. -->
+  <meta name="pwa-starter-template-identity" content="pwa-starter"/>
+
+  <!-- Imports an icon to represent the document. -->
+  <link rel="icon" href="/assets/icons/icon_24.png" type="image/png" />
+
+  <!-- Imports the manifest to represent the web application. A web app must have a manifest to be a PWA. -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- light mode and dark mode CSS -->
+  <link rel="stylesheet" media="(prefers-color-scheme:light)"
+    href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/dist/themes/light.css">
+  <link rel="stylesheet" media="(prefers-color-scheme:dark)"
+    href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/dist/themes/dark.css"
+    onload="document.documentElement.classList.add('sl-theme-dark');">
+
+
+  <script type="module" crossorigin src="/code/index-CxHMEzpi.js"></script>
 </head>
-<body class="layout-dark">
 
-    <div class="panel-overlay"></div>
-    
-    <div class="panel panel-left panel-cover">
-        <div style="padding: 25px 20px; background: #2196f3; color: #fff;"><h3>Настройки</h3></div>
-        <div class="list-block">
-            <ul>
-                <li><div class="item-content"><div class="item-inner">
-                    <div class="item-title">Ночной режим</div>
-                    <div class="item-after"><label class="label-switch"><input type="checkbox" id="dark-toggle" checked onchange="toggleNight()"><div class="checkbox"></div></label></div>
-                </div></div></li>
-                <li><a href="#" class="item-link list-button close-panel" onclick="location.reload()">Начать заново</a></li>
-            </ul>
-        </div>
-    </div>
+<body>
+  <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
+  <app-index></app-index>
 
-    <div class="views">
-        <div class="view view-main">
-            <div class="pages navbar-fixed toolbar-fixed">
-                
-                <div data-page="welcome" class="page">
-                    <div class="navbar"><div class="navbar-inner"><div class="center">Интеллектуальные расследования</div></div></div>
-                    <div class="page-content">
-                        <div class="welcome-screen">
-                            <p>Это не игра на скорость. Здесь каждое дело — это диалог и вывод. Ты выбираешь персонажа и его способ мышления.</p>
-
-                            <div class="list-block accordion-list">
-                                <ul>
-                                    <li class="accordion-item">
-                                        <a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">О ПЕРСОНАЖАХ</div></div></a>
-                                        <div class="accordion-item-content">
-                                            <p><b>Джейк Трент:</b> Нуар, дождь, прямые вопросы. Ошибается редко.</p>
-                                            <p><b>Анри Делакруа:</b> Ирония, детали, французский шарм. Замечает неявное.</p>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="setup-block">
-                                <span class="setup-title">1. КТО ВЕДЕТ ДЕЛО?</span>
-                                <div class="list-block">
-                                    <ul>
-                                        <li><label class="label-radio item-content"><input type="radio" name="char" value="Jake" checked onchange="state.char='Jake'"><div class="item-inner"><div class="item-title">Джейк Трент</div></div></label></li>
-                                        <li><label class="label-radio item-content"><input type="radio" name="char" value="Henri" onchange="state.char='Henri'"><div class="item-inner"><div class="item-title">Анри Делакруа</div></div></label></li>
-                                    </ul>
-                                </div>
-
-                                <span class="setup-title">2. УРОВЕНЬ СЛОЖНОСТИ</span>
-                                <div class="list-block">
-                                    <ul>
-                                        <li><label class="label-radio item-content"><input type="radio" name="lv" value="1" checked onchange="state.lv=1"><div class="item-inner"><div class="item-title">Стандартный анализ</div></div></label></li>
-                                        <li><label class="label-radio item-content"><input type="radio" name="lv" value="2" onchange="state.lv=2"><div class="item-inner"><div class="item-title">Углубленный поиск</div></div></label></li>
-                                        <li><label class="label-radio item-content"><input type="radio" name="lv" value="3" onchange="state.lv=3"><div class="item-inner"><div class="item-title">Мастер логики</div></div></label></li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="content-block">
-                                <a href="#" class="button button-big button-raised button-fill" onclick="startApp()">Начать расследование</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div data-page="index" class="page cached">
-                    <div class="navbar">
-                        <div class="navbar-inner">
-                            <div class="left"><a href="#" class="link icon-only open-panel"> <i class="icon icon-bars"></i> </a></div>
-                            <div class="center" id="main-title">Чат</div>
-                            <div class="right" style="padding-right:15px; font-weight:bold; color:#2196f3" id="lv-display">LV 1</div>
-                        </div>
-                    </div>
-                    <div class="page-content" id="chat-scroller">
-                        <div id="chat-box" style="padding: 15px 10px;"></div>
-                        <div id="typing-notice" style="padding: 15px; display: none; font-size: 16px; opacity: 0.6;">Детектив пишет...</div>
-                    </div>
-                    <div class="toolbar messagebar">
-                        <div class="toolbar-inner">
-                            <textarea id="msg-input" placeholder="Ваш ответ..."></textarea>
-                            <a href="#" class="link" onclick="handleSend()"><span class="send-icon">➤</span></a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/framework7/1.4.2/js/framework7.min.js"></script>
-    <script>
-        var myApp = new Framework7({ material: true });
-        var mainView = myApp.addView('.view-main');
-        var state = { char: 'Jake', lv: 1 };
-        var chatHistories = { Jake: [], Henri: [] };
-
-        function startApp() {
-            // Устанавливаем заголовок и бейдж сложности
-            document.getElementById('main-title').innerText = (state.char === 'Jake' ? 'Джейк Трент' : 'Анри Делакруа');
-            document.getElementById('lv-display').innerText = 'LV ' + state.lv;
-            
-            // Переходим в чат
-            mainView.router.load({pageName: 'index'});
-            
-            // Если чат пустой - выводим приветствие
-            setTimeout(function() {
-                if (chatHistories[state.char].length === 0) {
-                    var welcome = state.char === 'Jake' ? "Слушаю. Что за дело?" : "Я к вашим услугам. О чем поговорим?";
-                    draw(welcome, 'received');
-                }
-            }, 400);
-        }
-
-        function toggleNight() {
-            if (document.getElementById('dark-toggle').checked) document.body.classList.add('layout-dark');
-            else document.body.classList.remove('layout-dark');
-        }
-
-        function draw(text, type) {
-            var box = document.getElementById('chat-box');
-            var html = '<div class="message message-' + type + '"><div class="message-text">' + text + '</div></div>';
-            box.insertAdjacentHTML('beforeend', html);
-            var scroller = document.getElementById('chat-scroller');
-            
-            if(type === 'sent') {
-                scroller.scrollTop = scroller.scrollHeight;
-            } else {
-                box.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        async function handleSend() {
-            var inp = document.getElementById('msg-input');
-            var text = inp.value.trim();
-            if(!text) return;
-
-            chatHistories[state.char].push({text: text, type: 'sent'});
-            draw(text, 'sent');
-            inp.value = '';
-            document.getElementById('typing-notice').style.display = 'block';
-
-            try {
-                var res = await fetch('https://logic-q6qn.onrender.com/api/chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        char_id: state.char + state.lv, 
-                        history: chatHistories[state.char].slice(-6)
-                    })
-                });
-                var data = await res.json();
-                document.getElementById('typing-notice').style.display = 'none';
-                if(data.reply) {
-                    chatHistories[state.char].push({text: data.reply, type: 'received'});
-                    draw(data.reply, 'received');
-                }
-            } catch(e) {
-                document.getElementById('typing-notice').style.display = 'none';
-                draw("Проблема со связью.", "received");
-            }
-        }
-    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.onload = () => {
+        navigator.serviceWorker.register(
+          '/sw.js'
+        );
+      }
+    }
+  </script>
 </body>
+
 </html>
