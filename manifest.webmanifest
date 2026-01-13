@@ -1,1 +1,1 @@
-{"name":"Detective Logic Game","short_name":"Detective","start_url":"/pwa/","display":"standalone","background_color":"#ffffff","theme_color":"#0061a4","lang":"en","scope":"/pwa/","icons":[{"src":"favicon.svg","sizes":"any","type":"image/svg+xml"}]}
+{"name":"Детектив Грей: Нуарные дела","short_name":"Грей","description":"Интерактивные детективные расследования","start_url":"/pwa/","display":"standalone","background_color":"#fdfbff","theme_color":"#f3f3f7","lang":"en","scope":"/pwa/","icons":[{"src":"icon.png","sizes":"512x512","type":"image/png"}]}
