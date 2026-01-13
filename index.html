@@ -4,15 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Детектив Грей</title>
+    <link rel="manifest" href="/pwa/manifest.json">
+    <meta name="theme-color" content="#f3f3f7">
+    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <style>
-      body { margin: 0; background-color: #fdfbff; }
-    </style>
-    <script type="module" crossorigin src="/pwa/assets/index-COTJfrrX.js"></script>
+    <style>body { margin: 0; background-color: #fdfbff; }</style>
+    <script type="module" crossorigin src="/pwa/assets/index-BsO6UxOp.js"></script>
   <link rel="manifest" href="/pwa/manifest.webmanifest"><script id="vite-plugin-pwa:inline-sw">if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/pwa/sw.js', { scope: '/pwa/' })})}</script></head>
   <body>
     <app-index></app-index>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/pwa/sw.js');
+      }
+    </script>
   </body>
 </html>

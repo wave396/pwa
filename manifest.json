@@ -1,0 +1,17 @@
+{
+  "name": "Детектив Грей: Нуарные дела",
+  "short_name": "Грей",
+  "description": "Интерактивные детективные расследования в стиле нуар",
+  "start_url": "/pwa/",
+  "display": "standalone",
+  "background_color": "#fdfbff",
+  "theme_color": "#f3f3f7",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
