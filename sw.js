@@ -1,21 +1,34 @@
-const CACHE_NAME = 'grey-v1';
+const CACHE_NAME = "grey-v1";
 const ASSETS = [
-  '/pwa/',
-  '/pwa/index.html',
-  '/pwa/manifest.json',
-  '/pwa/icon.png'
+  "/pwa/",
+  "/pwa/index.html",
+  "/pwa/manifest.webmanifest",
+  "/pwa/icon.png"
 ];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+self.addEventListener("install", (event) => {
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+    ))
+  );
+});
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request).then((fetchResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          if (event.request.url.startsWith(self.location.origin)) {
+            cache.put(event.request, fetchResponse.clone());
+          }
+          return fetchResponse;
+        });
+      });
+    }).catch(() => {
     })
   );
 });
